@@ -61,6 +61,7 @@ button{cursor:pointer}
 
 /* ---- Leaflet theme overrides ---- */
 .leaflet-container{font:inherit;background:var(--surface-2)}
+.dark-tiles .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7)}
 .leaflet-touch .leaflet-bar,.leaflet-bar{border-radius:10px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
 .leaflet-touch .leaflet-bar a,.leaflet-bar a{width:34px;height:34px;line-height:34px;background:var(--surface);color:var(--ink);font:600 18px/34px var(--f-body);border-bottom:1px solid var(--line)}
 .leaflet-touch .leaflet-bar a:last-child,.leaflet-bar a:last-child{border-bottom:0}
@@ -598,15 +599,33 @@ async function geocode({rua, numero, bairro, cidade='Uberlândia', uf='MG'}){
 }
 
 /* ---------- map tiles ---------- */
-const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-const TILE_DARK = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-const ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
+// Mapas sem chave de API. Se o primeiro falhar, troca sozinho para o próximo.
+const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+const TILE_PROVIDERS = [
+  {url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png', opts:{maxZoom:19, attribution:OSM_ATTR}},
+  {url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', opts:{maxZoom:19, attribution:'Mapa &copy; Esri'}},
+  {url:'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', opts:{maxZoom:19, subdomains:'abc', attribution:OSM_ATTR + ', HOT'}}
+];
 const darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
 const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : darkMQ.matches; };
-const tileLayers = [];
-function addTiles(m){ const t = L.tileLayer(isDark() ? TILE_DARK : TILE_LIGHT, {attribution:ATTR, subdomains:'abcd', maxZoom:19}).addTo(m); tileLayers.push(t); return t; }
-const onScheme = () => tileLayers.forEach(t => t.setUrl(isDark() ? TILE_DARK : TILE_LIGHT));
+const onScheme = () => document.documentElement.classList.toggle('dark-tiles', isDark());
+onScheme();
 darkMQ.addEventListener ? darkMQ.addEventListener('change', onScheme) : darkMQ.addListener(onScheme);
+let tileProvider = 0;
+function addTiles(m){
+  let errors = 0, loaded = false, layer = null;
+  const use = i => {
+    if (layer) m.removeLayer(layer);
+    errors = 0; loaded = false;
+    layer = L.tileLayer(TILE_PROVIDERS[i].url, TILE_PROVIDERS[i].opts).addTo(m);
+    layer.on('tileload', () => { loaded = true; });
+    layer.on('tileerror', () => {
+      if (loaded || ++errors < 3) return;
+      if (i + 1 < TILE_PROVIDERS.length){ tileProvider = Math.max(tileProvider, i + 1); use(i + 1); }
+    });
+  };
+  use(tileProvider);
+}
 const CITY_BOUNDS = L.latLngBounds([-19.12,-48.52],[-18.72,-48.02]);
 
 /* ---------- icons ---------- */
