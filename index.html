@@ -1,0 +1,981 @@
+<title>Mapa dos GIs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..700&display=swap">
+<style>
+/* Layout: app shell — top bar with tabs; map view = filter sidebar + full-height map; dashboard and admin as scrolling panels */
+:root{
+  --bg:#F2F4F3; --surface:#FFFFFF; --surface-2:#E9EEEC; --ink:#16201D; --ink-2:#51605B; --line:#D5DDD9;
+  --accent:#0E6B5C; --accent-ink:#FFFFFF; --accent-soft:#DCEEE9;
+  --gold:#B8861B; --church-bg:#1E2530; --church-fg:#F6EBD0;
+  --you:#1C6DD0; --danger:#B42318; --danger-soft:#FBE4E1;
+  --map-land:#E7EBE6; --map-city:#F7F8F4; --map-street:#E2E6DF; --map-av:#FFFFFF; --map-av-case:#CDD4CC;
+  --map-hwy:#F0D59B; --map-river:#A7CADF; --map-park:#CFE3C6; --map-label:#6F7B76;
+  --s1:#0E6B5C; --s2:#1C6DD0; --s3:#B8861B; --s4:#C2255C; --s5:#6B5BB8;
+  --shadow:0 1px 2px rgb(20 30 28/.06),0 6px 20px rgb(20 30 28/.08);
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1413; --surface:#162020; --surface-2:#1E2A28; --ink:#E5ECE9; --ink-2:#9AAAA5; --line:#2A3835;
+  --accent:#43B79F; --accent-ink:#062019; --accent-soft:#16352F;
+  --gold:#E2B54E; --church-bg:#F1E6CB; --church-fg:#1E2530;
+  --you:#5EA4FF; --danger:#F2846C; --danger-soft:#3A1F1A;
+  --map-land:#111918; --map-city:#172220; --map-street:#22302D; --map-av:#34443F; --map-av-case:#0B1110;
+  --map-hwy:#4D4024; --map-river:#24485B; --map-park:#1C3325; --map-label:#7E8E89;
+  --s1:#43B79F; --s2:#5EA4FF; --s3:#E2B54E; --s4:#F06595; --s5:#9D8FEA;
+  --shadow:0 1px 2px rgb(0 0 0/.3),0 8px 24px rgb(0 0 0/.35);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1413; --surface:#162020; --surface-2:#1E2A28; --ink:#E5ECE9; --ink-2:#9AAAA5; --line:#2A3835;
+  --accent:#43B79F; --accent-ink:#062019; --accent-soft:#16352F;
+  --gold:#E2B54E; --church-bg:#F1E6CB; --church-fg:#1E2530;
+  --you:#5EA4FF; --danger:#F2846C; --danger-soft:#3A1F1A;
+  --map-land:#111918; --map-city:#172220; --map-street:#22302D; --map-av:#34443F; --map-av-case:#0B1110;
+  --map-hwy:#4D4024; --map-river:#24485B; --map-park:#1C3325; --map-label:#7E8E89;
+  --s1:#43B79F; --s2:#5EA4FF; --s3:#E2B54E; --s4:#F06595; --s5:#9D8FEA;
+  --shadow:0 1px 2px rgb(0 0 0/.3),0 8px 24px rgb(0 0 0/.35);
+  color-scheme:dark;
+}
+
+/* ---- Leaflet essentials (inlined) ---- */
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden;font:inherit;-webkit-tap-highlight-color:transparent;outline-offset:1px}
+.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}
+.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-image-layer,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}
+.leaflet-marker-icon.leaflet-interactive,.leaflet-image-layer.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive{pointer-events:auto}
+.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
+.leaflet-map-pane svg{z-index:200}
+.leaflet-touch-drag.leaflet-touch-zoom{touch-action:none}
+.leaflet-grab{cursor:grab}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-marker-draggable{cursor:grabbing}
+.leaflet-interactive{cursor:pointer}
+.leaflet-zoom-animated{transform-origin:0 0}
+.leaflet-zoom-anim .leaflet-zoom-animated{will-change:transform;transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}
+.leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}
+.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+.leaflet-right .leaflet-control{float:right}
+.leaflet-top .leaflet-control{margin-top:12px}.leaflet-left .leaflet-control{margin-left:12px}.leaflet-right .leaflet-control{margin-right:12px}
+.leaflet-bar{border-radius:10px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
+.leaflet-bar a{display:block;width:34px;height:34px;line-height:34px;text-align:center;text-decoration:none;background:var(--surface);color:var(--ink);font:600 18px/34px var(--f-body)}
+.leaflet-bar a+a{border-top:1px solid var(--line)}
+.leaflet-bar a:hover{background:var(--surface-2)}
+.leaflet-bar a.leaflet-disabled{color:var(--ink-2);opacity:.45;cursor:default}
+.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}
+.leaflet-popup-content-wrapper{text-align:left;border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--line)}
+.leaflet-popup-content{margin:14px 16px;line-height:1.35;min-height:1px;font-size:14px}
+.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}
+.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;transform:rotate(45deg);background:var(--surface);border:1px solid var(--line)}
+.leaflet-container a.leaflet-popup-close-button{position:absolute;top:6px;right:6px;width:28px;height:28px;font:20px/28px var(--f-body);text-align:center;text-decoration:none;color:var(--ink-2);border-radius:8px}
+.leaflet-container a.leaflet-popup-close-button:hover{background:var(--surface-2);color:var(--ink)}
+.leaflet-fade-anim .leaflet-popup{opacity:0;transition:opacity .2s linear}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}
+
+/* ---- Base ---- */
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f-body);display:flex;flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+
+/* ---- Top bar ---- */
+.topbar{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding-block:14px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
+.brand-mark{width:38px;height:38px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:800 15px var(--f-display)}
+.brand h1{font-size:20px;line-height:1.1}
+.brand p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.tabs{display:flex;background:var(--surface-2);border-radius:12px;padding:4px;gap:2px}
+.tab{border:0;background:none;padding:8px 14px;border-radius:9px;font-weight:600;font-size:14px;color:var(--ink-2)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.proto-tag{font-size:12px;font-weight:600;color:var(--ink-2);border:1px dashed var(--line);padding:5px 10px;border-radius:999px;white-space:nowrap}
+
+main{flex:1;min-height:0;padding-bottom:16px}
+.view{height:100%}
+
+/* ---- Map view ---- */
+.view-map{display:grid;grid-template-columns:minmax(300px,370px) minmax(0,1fr);gap:16px}
+.side{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px;padding-right:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.panel h2{font-size:16px;margin-bottom:10px}
+.search{position:relative}
+.search input{width:100%;padding:11px 12px 11px 38px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-2)}
+.near-row{display:flex;gap:8px;flex-wrap:wrap}
+.near-row select{flex:1;min-width:150px}
+select,.field input{padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);min-width:0}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 13px;border-radius:10px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;color:var(--ink)}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{background:var(--accent);filter:brightness(1.08)}
+.btn-ghost{border-color:transparent;background:none;color:var(--ink-2)}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:var(--surface)}
+.btn-sm{padding:6px 10px;font-size:13px}
+.you-status{margin:10px 0 0;font-size:13px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+.you-status .dot{width:10px;height:10px;border-radius:50%;background:var(--you);box-shadow:0 0 0 3px color-mix(in srgb,var(--you) 30%,transparent);flex:none}
+.filter-group+.filter-group{margin-top:12px}
+.filter-group .eyebrow{margin-bottom:7px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.list-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 2px}
+.list-head h2{font-size:16px}
+.list-head button{font-size:13px}
+.gi-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.gi-item{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 12px}
+.gi-item:hover{border-color:var(--ink-2)}
+.gi-item.is-sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.gi-item-body{display:flex;flex-direction:column;gap:1px;min-width:0}
+.gi-item-title{font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.gi-item-meta,.gi-item-lead{font-size:13px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gi-dist{font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag-near{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--you);color:var(--surface);padding:2px 7px;border-radius:999px}
+.empty{padding:22px 14px;text-align:center;color:var(--ink-2);background:var(--surface);border:1px dashed var(--line);border-radius:14px}
+
+.badge{--c:#888;--t:#fff;width:34px;height:34px;border-radius:50%;background:var(--c);color:var(--t);display:grid;place-items:center;
+  font:800 12px/1 var(--f-display);letter-spacing:.02em;flex:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 28%,transparent)}
+.badge.sm{width:28px;height:28px;font-size:10.5px}
+
+.map-wrap{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);min-height:0;background:var(--map-land)}
+#map{position:absolute;inset:0;background:var(--map-land)}
+.map-wrap.picking #map{cursor:crosshair}
+.pick-hint{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:1001;background:var(--you);color:var(--surface);font-weight:700;font-size:13.5px;
+  padding:9px 14px;border-radius:999px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:center;white-space:nowrap}
+.pick-hint button{border:0;background:rgb(255 255 255/.22);color:inherit;border-radius:999px;padding:3px 9px;font-size:12.5px;font-weight:700}
+.map-legend{position:absolute;left:12px;bottom:12px;z-index:1001;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px;
+  display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);max-width:calc(100% - 24px)}
+.map-legend span{display:flex;align-items:center;gap:6px}
+.lg-gi{width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.lg-church{width:14px;height:14px;border-radius:4px;background:var(--church-bg);box-shadow:0 0 0 2px var(--gold)}
+.lg-you{width:12px;height:12px;border-radius:50%;background:var(--you);border:2px solid var(--surface);box-shadow:0 0 0 2px var(--you)}
+.map-note{position:absolute;right:12px;bottom:12px;z-index:1001;font-size:11px;color:var(--ink-2);background:color-mix(in srgb,var(--surface) 82%,transparent);padding:3px 8px;border-radius:6px}
+
+/* Base map drawing */
+.m-land{fill:var(--map-land)} .m-city{fill:var(--map-city)}
+.m-street{stroke:var(--map-street);stroke-width:1.5;fill:none}
+.m-river{fill:none;stroke:var(--map-river);stroke-width:7;stroke-linecap:round}
+.m-park{fill:var(--map-park)}
+.m-hwy{fill:none;stroke:var(--map-hwy);stroke-width:7;stroke-linecap:round}
+.m-av-case{fill:none;stroke:var(--map-av-case);stroke-width:7.5;stroke-linecap:round}
+.m-av{fill:none;stroke:var(--map-av);stroke-width:5;stroke-linecap:round}
+.m-label{font:700 8.5px var(--f-body);letter-spacing:.1em;fill:var(--map-label);text-anchor:middle}
+.m-poi{font:italic 600 7.5px var(--f-body);fill:var(--map-label);text-anchor:middle}
+.m-avlabel{font:600 6.5px var(--f-body);fill:var(--map-label);letter-spacing:.03em}
+.zlow .m-avlabel,.zlow .m-poi{display:none}
+.zfar .m-label{display:none}
+
+/* Pins */
+.gi-icon,.church-icon,.you-icon{background:none;border:0}
+.gi-pin{--c:#888;--t:#fff;width:42px;height:42px;border-radius:50%;background:var(--c);color:var(--t);display:grid;place-items:center;
+  border:2px solid rgb(255 255 255/.9);box-shadow:0 0 0 7px color-mix(in srgb,var(--c) 30%,transparent),0 3px 8px rgb(0 0 0/.25);
+  font:800 13px/1 var(--f-display);letter-spacing:.02em;transition:transform .15s ease,box-shadow .15s ease}
+.gi-pin.long{font-size:11px}
+.gi-icon:hover .gi-pin{transform:scale(1.08)}
+.is-sel .gi-pin{transform:scale(1.18);box-shadow:0 0 0 10px color-mix(in srgb,var(--c) 34%,transparent),0 4px 12px rgb(0 0 0/.3)}
+.church-pin{width:48px;height:48px;border-radius:14px;background:var(--church-bg);color:var(--church-fg);display:grid;place-items:center;position:relative;
+  box-shadow:0 0 0 3px var(--gold),0 4px 12px rgb(0 0 0/.3)}
+.church-pin::after{content:"";position:absolute;inset:-3px;border-radius:16px;border:3px solid var(--gold);animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.7)}}
+.church-label{position:absolute;top:56px;left:50%;transform:translateX(-50%);white-space:nowrap;font:800 11px var(--f-display);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink);background:var(--surface);border:1px solid var(--gold);padding:2px 7px;border-radius:6px}
+.you-pin{width:20px;height:20px;border-radius:50%;background:var(--you);border:3px solid var(--surface);box-shadow:0 0 0 6px color-mix(in srgb,var(--you) 28%,transparent),0 2px 6px rgb(0 0 0/.3)}
+.near-line{stroke:var(--you);stroke-width:2.5;stroke-dasharray:6 7;fill:none;stroke-linecap:round}
+@media (prefers-reduced-motion: reduce){.church-pin::after{animation:none;opacity:0}.gi-pin{transition:none}}
+
+/* Popup content */
+.pp-head{display:flex;gap:11px;align-items:center;margin-right:22px}
+.pp-title{font:700 16px/1.2 var(--f-display)}
+.pp-sub{font-size:13px;color:var(--ink-2)}
+.pp-dl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:12px 0;font-size:13.5px}
+.pp-dl dt{color:var(--ink-2)} .pp-dl dd{margin:0;font-weight:600}
+.pp .btn{width:100%}
+.btn-wa svg{flex:none}
+
+/* ---- Dashboard ---- */
+.scroll{overflow:auto}
+.dash{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;padding-bottom:4px}
+.dash-head{grid-column:1/-1;display:flex;justify-content:space-between;align-items:end;gap:10px;flex-wrap:wrap;padding-top:4px}
+.dash-head h2{font-size:24px}
+.dash-head p{margin:2px 0 0;color:var(--ink-2);font-size:14px}
+.kpi{grid-column:span 3;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.kpi .v{font:800 34px/1.1 var(--f-display);font-variant-numeric:tabular-nums;margin-top:6px}
+.kpi .v small{font-size:16px;color:var(--ink-2);font-weight:600}
+.kpi .h{font-size:13px;color:var(--ink-2)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.card h3{font-size:16px}
+.card .sub{font-size:13px;color:var(--ink-2);margin:2px 0 14px}
+.c-7{grid-column:span 7}.c-5{grid-column:span 5}.c-4{grid-column:span 4}.c-8{grid-column:span 8}.c-6{grid-column:span 6}
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar-row{display:grid;grid-template-columns:28px minmax(0,140px) minmax(0,1fr) 32px;gap:10px;align-items:center;font-size:13.5px}
+.bar-row .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.bar-fill{height:100%;border-radius:999px;background:var(--c)}
+.bar-row .val{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:170px;padding-top:6px}
+.day{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
+.day .col{width:100%;max-width:38px;border-radius:8px 8px 3px 3px;background:var(--accent);opacity:.55;min-height:3px}
+.day.max .col{opacity:1}
+.day .cnt{font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+.day .lbl{font-size:12px;color:var(--ink-2);font-weight:600}
+.seg{display:flex;height:14px;border-radius:999px;overflow:hidden;gap:2px;margin-bottom:12px}
+.seg span{background:var(--c)}
+.seg-legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px 12px;font-size:13px}
+.seg-legend div{display:flex;align-items:center;gap:7px}
+.seg-legend i{width:10px;height:10px;border-radius:3px;background:var(--c);flex:none}
+.seg-legend b{margin-left:auto;font-variant-numeric:tabular-nums}
+.cov-map{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--map-land)}
+.cov-map svg{display:block;width:100%;height:auto}
+.cov-gap{fill:color-mix(in srgb,var(--danger) 14%,transparent);stroke:var(--danger);stroke-width:1.6;stroke-dasharray:4 3}
+.cov-gi{stroke:var(--surface);stroke-width:2}
+.cov-church{fill:var(--church-bg);stroke:var(--gold);stroke-width:2}
+.cov-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);margin-top:10px}
+.cov-legend span{display:flex;align-items:center;gap:6px}
+.gap-chips{display:flex;flex-wrap:wrap;gap:6px}
+.gap-chip{font-size:13px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--danger-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--danger) 35%,transparent)}
+.feed{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.feed li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px}
+.feed li:first-child{border-top:0;padding-top:0}
+.feed .t{color:var(--ink-2);font-size:12.5px;white-space:nowrap}
+.ex{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;margin-left:6px}
+
+/* ---- Admin ---- */
+.admin-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;padding-top:4px;margin-bottom:14px}
+.admin-head h2{font-size:24px}
+.admin-head p{margin:2px 0 0;color:var(--ink-2);font-size:14px}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+th{text-align:left;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:700;padding:12px 14px;border-bottom:1px solid var(--line)}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.td-gi{display:flex;align-items:center;gap:10px;font-weight:700}
+.td-muted{color:var(--ink-2)}
+.td-actions{display:flex;gap:6px;justify-content:flex-end;align-items:center;white-space:nowrap}
+.confirm-txt{font-size:13px;font-weight:600;color:var(--danger)}
+
+/* Drawer + modal */
+.scrim{position:fixed;inset:0;background:rgb(10 16 15/.45);z-index:3000;display:flex;justify-content:flex-end}
+.drawer{width:min(560px,100%);height:100%;background:var(--bg);border-left:1px solid var(--line);display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.drawer-head{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.drawer-head h2{font-size:19px;flex:1}
+.drawer-body{flex:1;overflow:auto;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.drawer-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 18px;border-top:1px solid var(--line);background:var(--surface)}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label,.field .lab{font-size:13px;font-weight:700}
+.field .hint{font-size:12px;color:var(--ink-2)}
+.field .err{font-size:12.5px;color:var(--danger);font-weight:600}
+.field input.bad{border-color:var(--danger)}
+.swatches{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid var(--surface);background:var(--c);box-shadow:0 0 0 1px var(--line)}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.swatches input[type=color]{width:34px;height:30px;padding:0 2px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}
+#fmap{height:260px;border-radius:12px;border:1px solid var(--line);background:var(--map-land)}
+.modal{margin:auto;width:min(440px,calc(100% - 32px));background:var(--surface);border-radius:18px;border:1px solid var(--line);padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
+.modal-scrim{justify-content:center;align-items:center}
+.modal h2{font-size:19px}
+.msg{background:var(--surface-2);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5;white-space:pre-wrap}
+.modal-row{display:flex;gap:8px;flex-wrap:wrap}
+.modal-row .btn{flex:1}
+.phone{font-weight:700;font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:4000;background:var(--ink);color:var(--bg);
+  padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:var(--shadow)}
+
+/* ---- Responsive ---- */
+@media (max-width:1000px){.kpi{grid-column:span 6}.c-7,.c-5,.c-4,.c-8,.c-6{grid-column:1/-1}}
+@media (max-width:820px){
+  html,body{height:auto}
+  main{flex:none}
+  .view{height:auto}
+  .view-map{grid-template-columns:minmax(0,1fr)}
+  .map-wrap{height:60vh;min-height:380px;order:-1}
+  .side{overflow:visible;padding-right:0}
+  .scroll{overflow:visible}
+  .proto-tag{display:none}
+  .tabs{width:100%}.tab{flex:1}
+}
+@media (max-width:520px){
+  .drawer-body{grid-template-columns:minmax(0,1fr)}
+  .kpi .v{font-size:28px}
+  .bar-row{grid-template-columns:28px minmax(0,1fr) 60px 26px}
+  .map-note{display:none}
+}
+</style>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">GI</div>
+    <div><h1>Mapa dos GIs</h1><p>Grupos Imagine · Uberlândia</p></div>
+  </div>
+  <span class="proto-tag">Protótipo · dados fictícios</span>
+  <nav class="tabs" role="tablist" aria-label="Seções">
+    <button class="tab" role="tab" id="tab-mapa" data-view="mapa" aria-selected="true">Mapa</button>
+    <button class="tab" role="tab" id="tab-dashboard" data-view="dashboard" aria-selected="false">Dashboard</button>
+    <button class="tab" role="tab" id="tab-admin" data-view="admin" aria-selected="false">Admin</button>
+  </nav>
+</header>
+
+<main>
+  <!-- MAPA -->
+  <section class="view view-map" id="view-mapa">
+    <aside class="side" aria-label="Busca e filtros">
+      <label class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Buscar GI, líder ou bairro" autocomplete="off">
+      </label>
+
+      <div class="panel">
+        <h2>Encontrar GI perto de mim</h2>
+        <div class="near-row">
+          <select id="you-bairro" aria-label="Seu bairro"><option value="">Escolha seu bairro</option></select>
+          <button class="btn" id="btn-pick" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0119 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            Marcar no mapa
+          </button>
+        </div>
+        <p class="you-status" id="you-status">No app real: localização do celular ou CEP.</p>
+      </div>
+
+      <div class="panel">
+        <div class="filter-group">
+          <span class="eyebrow">Dia do encontro</span>
+          <div class="chips" id="f-dias"></div>
+        </div>
+        <div class="filter-group">
+          <span class="eyebrow">Público</span>
+          <div class="chips" id="f-pub"></div>
+        </div>
+        <div class="filter-group">
+          <label class="eyebrow" for="f-bairro-sel">Bairro do GI</label>
+          <select id="f-bairro-sel" style="width:100%"><option value="">Todos os bairros</option></select>
+        </div>
+      </div>
+
+      <div class="list-head">
+        <h2 id="list-title">GIs</h2>
+        <button class="btn btn-ghost btn-sm" id="btn-clear" type="button">Limpar filtros</button>
+      </div>
+      <ul class="gi-list" id="gi-list"></ul>
+    </aside>
+
+    <div class="map-wrap" id="map-wrap">
+      <div id="map" role="application" aria-label="Mapa dos GIs"></div>
+      <div class="pick-hint" id="pick-hint" hidden>Toque no mapa onde você mora <button type="button" id="btn-pick-cancel">Cancelar</button></div>
+      <div class="map-legend">
+        <span><i class="lg-church"></i>Igreja</span>
+        <span><i class="lg-gi"></i>GI</span>
+        <span><i class="lg-you"></i>Você</span>
+      </div>
+      <div class="map-note">Mapa ilustrativo de Uberlândia</div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="view scroll" id="view-dashboard" hidden>
+    <div class="dash" id="dash"></div>
+  </section>
+
+  <!-- ADMIN -->
+  <section class="view scroll" id="view-admin" hidden>
+    <div class="admin-head">
+      <div>
+        <h2>Cadastro de GIs</h2>
+        <p>Crie, edite e posicione os GIs. As mudanças aparecem no mapa na hora.</p>
+      </div>
+      <div class="admin-actions">
+        <button class="btn btn-ghost" id="btn-reset" type="button">Restaurar exemplo</button>
+        <button class="btn btn-primary" id="btn-new" type="button">+ Novo GI</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>GI</th><th>Bairro</th><th>Encontro</th><th>Público</th><th>Líderes</th><th class="num">Part.</th><th></th></tr></thead>
+        <tbody id="admin-rows"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- Form drawer -->
+<div class="scrim" id="drawer" hidden>
+  <form class="drawer" id="gi-form" novalidate>
+    <div class="drawer-head">
+      <span class="badge" id="f-preview">GI</span>
+      <h2 id="drawer-title">Novo GI</h2>
+      <button class="btn btn-ghost btn-sm" type="button" data-close-drawer aria-label="Fechar">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="field"><label for="f-nome">Nome do GI</label><input id="f-nome" placeholder="GI Vida"><span class="err" id="e-nome" hidden></span></div>
+      <div class="field"><label for="f-sigla">Sigla</label><input id="f-sigla" maxlength="4" placeholder="GV" style="text-transform:uppercase"><span class="hint">Até 4 letras. Aparece no marcador.</span><span class="err" id="e-sigla" hidden></span></div>
+      <div class="field full"><span class="lab">Cor do GI</span>
+        <div class="swatches" id="f-swatches"></div>
+      </div>
+      <div class="field"><label for="f-bairro">Bairro</label><select id="f-bairro"></select></div>
+      <div class="field"><label for="f-endereco">Endereço</label><input id="f-endereco" placeholder="Rua, número"></div>
+      <div class="field"><label for="f-dia">Dia</label><select id="f-dia"></select></div>
+      <div class="field"><label for="f-hora">Horário</label><input id="f-hora" type="time" value="20:00"></div>
+      <div class="field"><label for="f-publico">Público</label><select id="f-publico"></select></div>
+      <div class="field"><label for="f-part">Participantes</label><input id="f-part" type="number" min="0" value="0"></div>
+      <div class="field full"><label for="f-lideres">Líderes</label><input id="f-lideres" placeholder="Carlos e Ana Ribeiro"></div>
+      <div class="field full"><label for="f-whats">WhatsApp do líder</label><input id="f-whats" inputmode="tel" placeholder="(34) 99999-0000"></div>
+      <div class="field full"><span class="lab">Localização no mapa</span>
+        <div id="fmap"></div>
+        <span class="hint">Clique no mapa ou arraste o marcador. No sistema real, o endereço vira coordenada sozinho e aqui você só ajusta.</span>
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn" type="button" data-close-drawer>Cancelar</button>
+      <button class="btn btn-primary" type="submit">Salvar GI</button>
+    </div>
+  </form>
+</div>
+
+<!-- Interest modal -->
+<div class="scrim modal-scrim" id="wa-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="wa-title">
+    <div style="display:flex;gap:12px;align-items:center">
+      <span class="badge" id="wa-badge">GI</span>
+      <div><h2 id="wa-title">Quero participar</h2><div class="pp-sub" id="wa-sub"></div></div>
+    </div>
+    <div class="field"><label for="wa-nome">Seu nome</label><input id="wa-nome" placeholder="Como o líder vai te chamar"></div>
+    <div><span class="eyebrow">Mensagem pronta</span><div class="msg" id="wa-msg"></div></div>
+    <div style="font-size:13px;color:var(--ink-2)">Enviar para <span class="phone" id="wa-phone"></span> (número fictício)</div>
+    <div class="modal-row">
+      <button class="btn" type="button" id="wa-copy">Copiar mensagem</button>
+      <a class="btn btn-primary btn-wa" id="wa-open" href="#" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5l1.3-4.1A8.5 8.5 0 1 1 8 19.6z"/></svg>
+        Abrir WhatsApp
+      </a>
+    </div>
+    <button class="btn btn-ghost" type="button" data-close-modal>Fechar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(() => {
+const NS = 'http://www.w3.org/2000/svg';
+const W = 1000, H = 800, M_UNIT = 18; // 1 unidade do desenho ≈ 18 m
+const DIAS = [['Seg','Segunda'],['Ter','Terça'],['Qua','Quarta'],['Qui','Quinta'],['Sex','Sexta'],['Sáb','Sábado'],['Dom','Domingo']];
+const DIA_FULL = Object.fromEntries(DIAS);
+const PUBLICOS = ['Geral','Jovens','Casais','Mulheres','Homens'];
+const SWATCHES = ['#1C6DD0','#0E8A6A','#7A3FC4','#C2255C','#D9480F','#0B7A94','#B02525','#3B4CC0','#8A5A00','#2B8A3E','#9C36B5','#495057'];
+
+const BAIRROS = [
+  {n:'Centro',x:505,y:375},{n:'Fundinho',x:470,y:452},{n:'Martins',x:410,y:362},{n:'Osvaldo Rezende',x:398,y:282},
+  {n:'Brasil',x:565,y:300},{n:'Presidente Roosevelt',x:480,y:192},{n:'Jardim Brasília',x:605,y:168},{n:'Umuarama',x:690,y:268},
+  {n:'Tibery',x:748,y:340},{n:'Santa Mônica',x:655,y:452},{n:'Segismundo Pereira',x:800,y:482},{n:'Saraiva',x:548,y:548},
+  {n:'Lídice',x:430,y:528},{n:'Jardim Karaíba',x:610,y:650},{n:'Granada',x:375,y:640},{n:'Laranjeiras',x:470,y:705},
+  {n:'Planalto',x:222,y:442},{n:'Luizote de Freitas',x:155,y:330},{n:'Jaraguá',x:290,y:352},{n:'Morumbi',x:880,y:330},
+  {n:'Shopping Park',x:565,y:745},{n:'Tocantins',x:235,y:228}
+];
+const bairroBy = n => BAIRROS.find(b => b.n === n);
+
+const SEED = [
+  {id:'gv', sigla:'GV', nome:'GI Vida', cor:'#1C6DD0', bairro:'Santa Mônica', x:648,y:446, endereco:'Rua das Acácias, 120', dia:'Qui', hora:'20:00', publico:'Geral', lideres:'Carlos e Ana Ribeiro', whats:'(34) 99999-0101', participantes:14},
+  {id:'glz', sigla:'GLZ', nome:'GI Luz', cor:'#D9480F', bairro:'Tibery', x:742,y:334, endereco:'Rua Ipê Amarelo, 455', dia:'Ter', hora:'19:30', publico:'Casais', lideres:'Marcos e Júlia Prado', whats:'(34) 99999-0102', participantes:10},
+  {id:'gf', sigla:'GF', nome:'GI Fé', cor:'#7A3FC4', bairro:'Centro', x:498,y:358, endereco:'Rua Olegário Maciel, 88', dia:'Qua', hora:'20:00', publico:'Geral', lideres:'Pr. Roberto Alves', whats:'(34) 99999-0103', participantes:18},
+  {id:'gja', sigla:'GJA', nome:'GI Jovens Atos', cor:'#C2255C', bairro:'Umuarama', x:684,y:262, endereco:'Rua Quintino Bocaiúva, 900', dia:'Sáb', hora:'19:00', publico:'Jovens', lideres:'Lucas Martins e Bia Souza', whats:'(34) 99999-0104', participantes:22},
+  {id:'gr', sigla:'GR', nome:'GI Renovo', cor:'#0E8A6A', bairro:'Martins', x:404,y:352, endereco:'Rua Bernardo Guimarães, 310', dia:'Seg', hora:'20:00', publico:'Mulheres', lideres:'Débora Lima', whats:'(34) 99999-0105', participantes:9},
+  {id:'gs', sigla:'GS', nome:'GI Semear', cor:'#8A5A00', bairro:'Jardim Karaíba', x:604,y:642, endereco:'Rua dos Jacarandás, 72', dia:'Qui', hora:'19:30', publico:'Casais', lideres:'Felipe e Renata Costa', whats:'(34) 99999-0106', participantes:8},
+  {id:'ge', sigla:'GE', nome:'GI Esperança', cor:'#0B7A94', bairro:'Luizote de Freitas', x:150,y:320, endereco:'Rua Rio Paranaíba, 1.204', dia:'Ter', hora:'20:00', publico:'Geral', lideres:'Antônio e Marli Freitas', whats:'(34) 99999-0107', participantes:12},
+  {id:'gp', sigla:'GP', nome:'GI Promessa', cor:'#B02525', bairro:'Planalto', x:218,y:432, endereco:'Rua Serra da Canastra, 66', dia:'Qua', hora:'19:30', publico:'Geral', lideres:'Sérgio Mendes', whats:'(34) 99999-0108', participantes:11},
+  {id:'ga', sigla:'GA', nome:'GI Aliança', cor:'#3B4CC0', bairro:'Presidente Roosevelt', x:476,y:182, endereco:'Av. Monsenhor Eduardo, 1.530', dia:'Sex', hora:'20:00', publico:'Homens', lideres:'Paulo Henrique Dias', whats:'(34) 99999-0109', participantes:7},
+  {id:'grf', sigla:'GRF', nome:'GI Refúgio', cor:'#2B8A3E', bairro:'Saraiva', x:542,y:538, endereco:'Rua Belo Horizonte, 214', dia:'Sex', hora:'19:30', publico:'Geral', lideres:'Tiago e Carol Nunes', whats:'(34) 99999-0110', participantes:15},
+  {id:'gb', sigla:'GB', nome:'GI Betel', cor:'#9C36B5', bairro:'Segismundo Pereira', x:794,y:472, endereco:'Rua das Paineiras, 39', dia:'Seg', hora:'19:30', publico:'Jovens', lideres:'Rafael Gomes e Lívia Rocha', whats:'(34) 99999-0111', participantes:16},
+  {id:'gsh', sigla:'GSH', nome:'GI Shalom', cor:'#495057', bairro:'Laranjeiras', x:466,y:696, endereco:'Rua Laranja-Lima, 150', dia:'Qua', hora:'20:00', publico:'Mulheres', lideres:'Cláudia Prado', whats:'(34) 99999-0112', participantes:10},
+  {id:'gm', sigla:'GM', nome:'GI Maná', cor:'#0B7A94', bairro:'Jardim Brasília', x:600,y:158, endereco:'Rua Brasília, 501', dia:'Qui', hora:'20:00', publico:'Geral', lideres:'Edson e Sônia Batista', whats:'(34) 99999-0113', participantes:9}
+];
+const CHURCH = {nome:'Igreja Sede', endereco:'Av. Floriano Peixoto, 1500 · Centro', culto:'Domingos 9h e 19h', x:552,y:404};
+
+/* ---------- storage (optional convenience) ---------- */
+const KEY = 'mapa-gis-proto-v1';
+function load(){ try{ const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({gis, interests})); }catch(e){} }
+function seedInterests(){
+  const now = Date.now();
+  return [
+    {nome:'Mariana S.', gi:'gja', ts: now - 2*36e5, ex:true},
+    {nome:'João Pedro', gi:'gv', ts: now - 5*36e5, ex:true},
+    {nome:'Família Duarte', gi:'gs', ts: now - 27*36e5, ex:true},
+    {nome:'Aline M.', gi:'gr', ts: now - 50*36e5, ex:true}
+  ];
+}
+const stored = load();
+let gis = stored?.gis || JSON.parse(JSON.stringify(SEED));
+let interests = stored?.interests || seedInterests();
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toLL = (x,y) => L.latLng(H - y, x);
+const fromLL = ll => ({x: ll.lng, y: H - ll.lat});
+function textOn(hex){
+  const h = hex.replace('#',''); const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  return (0.299*r + 0.587*g + 0.114*b)/255 > 0.62 ? '#14181A' : '#FFFFFF';
+}
+const badge = (g, cls='') => `<span class="badge ${cls}" style="--c:${g.cor};--t:${textOn(g.cor)}">${esc(g.sigla)}</span>`;
+let you = null, selectedId = null, picking = false;
+const dist = g => Math.hypot(g.x - you.x, g.y - you.y) * M_UNIT;
+const fmtDist = m => m < 1000 ? `${Math.max(50, Math.round(m/50)*50)} m` : `${(m/1000).toFixed(1).replace('.',',')} km`;
+const nearestBairro = (x,y) => BAIRROS.reduce((a,b) => Math.hypot(b.x-x,b.y-y) < Math.hypot(a.x-x,a.y-y) ? b : a);
+const leaderCount = g => g.lideres.replace(/^Pr\.\s*/,'').split(/\s+e\s+|,/).filter(Boolean).length;
+function relTime(ts){
+  const m = Math.round((Date.now()-ts)/6e4);
+  if (m < 1) return 'agora'; if (m < 60) return `há ${m} min`;
+  const h = Math.round(m/60); if (h < 24) return `há ${h} h`;
+  const d = Math.round(h/24); return d === 1 ? 'ontem' : `há ${d} dias`;
+}
+let toastT;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true, 2600); }
+
+/* ---------- base map drawing ---------- */
+const CITY = 'M120,260 C180,120 420,88 620,108 C790,128 935,230 945,385 C955,525 825,705 620,772 C430,822 215,742 148,602 C88,480 80,360 120,260Z';
+const AVENUES = [
+  {id:'av1', d:'M505,380 C585,452 652,520 722,582 C760,616 792,654 812,708', n:'Av. João Naves de Ávila', off:'38%'},
+  {id:'av2', d:'M215,432 C330,426 420,422 505,418 C600,414 690,406 800,396', n:'Av. Rondon Pacheco', off:'8%'},
+  {id:'av3', d:'M498,112 C504,220 506,300 506,380 C506,470 516,565 528,690', n:'Av. Afonso Pena', off:'12%'},
+  {id:'av4', d:'M150,330 C240,320 320,312 400,300 C470,290 540,286 690,268', n:'Av. José Fonseca e Silva', off:'6%'}
+];
+function baseSvg(uid){
+  const s = document.createElementNS(NS,'svg');
+  s.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  s.setAttribute('xmlns', NS);
+  const av = AVENUES.map(a => `<path d="${a.d}" class="m-av-case"/>`).join('') +
+             AVENUES.map(a => `<path id="${a.id}-${uid}" d="${a.d}" class="m-av"/>`).join('') +
+             AVENUES.map(a => `<text class="m-avlabel" dy="-5"><textPath href="#${a.id}-${uid}" startOffset="${a.off}">${a.n}</textPath></text>`).join('');
+  const labels = BAIRROS.map(b => `<text x="${b.x}" y="${b.y + 32}" class="m-label">${b.n.toUpperCase()}</text>`).join('');
+  s.innerHTML = `
+    <defs>
+      <pattern id="grid-${uid}" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(14)">
+        <path d="M0 0H20M0 0V20" class="m-street"/>
+      </pattern>
+      <clipPath id="clip-${uid}"><path d="${CITY}"/></clipPath>
+    </defs>
+    <rect width="${W}" height="${H}" class="m-land"/>
+    <path d="${CITY}" class="m-city"/>
+    <rect width="${W}" height="${H}" fill="url(#grid-${uid})" clip-path="url(#clip-${uid})"/>
+    <ellipse cx="770" cy="404" rx="36" ry="22" class="m-park"/>
+    <text x="770" y="407" class="m-poi">Parque do Sabiá</text>
+    <rect x="676" y="478" width="52" height="30" rx="5" class="m-park"/>
+    <text x="702" y="496" class="m-poi">UFU</text>
+    <ellipse cx="312" cy="560" rx="16" ry="44" class="m-park"/>
+    <path d="M335,30 C300,200 348,300 306,420 C270,520 338,620 300,800" class="m-river"/>
+    <text x="282" y="610" class="m-poi" transform="rotate(-80 282 610)">Rio Uberabinha</text>
+    <path d="M915,40 C885,250 866,420 850,560 C838,660 822,740 800,800" class="m-hwy"/>
+    <text x="900" y="200" class="m-poi" transform="rotate(84 900 200)">BR-050</text>
+    ${av}
+    ${labels}`;
+  return s;
+}
+
+/* ---------- icons ---------- */
+const giIcon = (g, extra='') => L.divIcon({
+  className:'gi-icon' + extra,
+  html:`<div class="gi-pin ${g.sigla.length > 2 ? 'long':''}" style="--c:${g.cor};--t:${textOn(g.cor)}"><span>${esc(g.sigla || '?')}</span></div>`,
+  iconSize:[42,42], iconAnchor:[21,21], popupAnchor:[0,-20]
+});
+const CHURCH_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M10 4h4M5 21V12l7-5 7 5v9M10 21v-4a2 2 0 014 0v4M3 21h18"/></svg>';
+const churchIcon = (label=true) => L.divIcon({className:'church-icon', html:`<div class="church-pin">${CHURCH_SVG}</div>${label?'<div class="church-label">Igreja Sede</div>':''}`, iconSize:[48,48], iconAnchor:[24,24], popupAnchor:[0,-22]});
+const youIcon = L.divIcon({className:'you-icon', html:'<div class="you-pin"></div>', iconSize:[20,20], iconAnchor:[10,10]});
+
+/* ---------- main map ---------- */
+const mapEl = $('#map');
+const map = L.map(mapEl, {crs:L.CRS.Simple, minZoom:-2, maxZoom:2, zoomSnap:0.25, zoomDelta:0.5, zoomControl:false, attributionControl:false,
+  maxBounds:[[-150,-150],[H+150,W+150]], maxBoundsViscosity:0.8});
+L.control.zoom({position:'topright', zoomInTitle:'Aproximar', zoomOutTitle:'Afastar'}).addTo(map);
+L.svgOverlay(baseSvg('m'), [[0,0],[H,W]]).addTo(map);
+const CITY_BOUNDS = L.latLngBounds(toLL(90,790), toLL(950,100));
+map.fitBounds(CITY_BOUNDS, {padding:[10,10]});
+function zoomClass(){ const z=map.getZoom(); mapEl.classList.toggle('zlow', z < -0.25); mapEl.classList.toggle('zfar', z < -1.1); }
+map.on('zoomend', zoomClass); zoomClass();
+
+L.marker(toLL(CHURCH.x, CHURCH.y), {icon:churchIcon(), zIndexOffset:2000, title:CHURCH.nome})
+ .bindPopup(() => `<div class="pp"><div class="pp-head"><span class="church-pin" style="width:38px;height:38px;border-radius:11px">${CHURCH_SVG}</span><div><div class="pp-title">${CHURCH.nome}</div><div class="pp-sub">${CHURCH.endereco}</div></div></div>
+   <dl class="pp-dl"><dt>Cultos</dt><dd>${CHURCH.culto}</dd>${you?`<dt>Distância</dt><dd>${fmtDist(Math.hypot(CHURCH.x-you.x,CHURCH.y-you.y)*M_UNIT)}</dd>`:''}</dl></div>`, {maxWidth:290, minWidth:230})
+ .addTo(map);
+
+const giLayer = L.layerGroup().addTo(map);
+const markers = new Map();
+let youMarker = null, nearLine = null;
+
+/* ---------- filters ---------- */
+const filt = {q:'', dias:new Set(), pub:new Set(), bairro:''};
+function filtered(){
+  const q = filt.q.trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+  let list = gis.filter(g =>
+    (!q || norm(`${g.nome} ${g.sigla} ${g.lideres} ${g.bairro}`).includes(q)) &&
+    (!filt.dias.size || filt.dias.has(g.dia)) &&
+    (!filt.pub.size || filt.pub.has(g.publico)) &&
+    (!filt.bairro || g.bairro === filt.bairro));
+  if (you) list.sort((a,b) => dist(a) - dist(b));
+  else list.sort((a,b) => a.nome.localeCompare(b.nome,'pt'));
+  return list;
+}
+
+function popupHtml(g){
+  return `<div class="pp">
+    <div class="pp-head">${badge(g)}<div><div class="pp-title">${esc(g.nome)}</div><div class="pp-sub">${esc(g.bairro)}${you?` · ${fmtDist(dist(g))} de você`:''}</div></div></div>
+    <dl class="pp-dl">
+      <dt>Encontro</dt><dd>${DIA_FULL[g.dia]}, ${esc(g.hora)}</dd>
+      <dt>Público</dt><dd>${esc(g.publico)}</dd>
+      <dt>Líderes</dt><dd>${esc(g.lideres)}</dd>
+      <dt>Endereço</dt><dd>${esc(g.endereco)}</dd>
+    </dl>
+    <button class="btn btn-primary btn-wa" type="button" data-interest="${g.id}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5l1.3-4.1A8.5 8.5 0 1 1 8 19.6z"/></svg>
+      Quero participar</button>
+  </div>`;
+}
+
+function renderMap(list){
+  giLayer.clearLayers(); markers.clear();
+  list.forEach(g => {
+    const m = L.marker(toLL(g.x,g.y), {icon:giIcon(g), riseOnHover:true, title:g.nome, alt:g.nome})
+      .bindPopup(() => popupHtml(g), {maxWidth:300, minWidth:240});
+    m.on('click', () => { selectedId = g.id; markSel(); });
+    m.on('popupclose', () => { if (selectedId === g.id){ selectedId = null; markSel(); } });
+    giLayer.addLayer(m); markers.set(g.id, m);
+  });
+  if (nearLine){ map.removeLayer(nearLine); nearLine = null; }
+  if (you && list.length){
+    const n = list[0];
+    nearLine = L.polyline([toLL(you.x,you.y), toLL(n.x,n.y)], {className:'near-line', interactive:false}).addTo(map);
+  }
+  markSel();
+}
+function markSel(){
+  markers.forEach((m,id) => { const el = m.getElement(); if (el) el.classList.toggle('is-sel', id === selectedId); });
+  document.querySelectorAll('.gi-item').forEach(b => b.classList.toggle('is-sel', b.dataset.id === selectedId));
+}
+
+function renderList(list){
+  const n = list.length;
+  $('#list-title').textContent = you ? (n ? `Mais perto de você (${n})` : 'Nenhum GI') : `${n} ${n===1?'GI':'GIs'}`;
+  const anyFilter = filt.q || filt.dias.size || filt.pub.size || filt.bairro;
+  $('#btn-clear').hidden = !anyFilter;
+  $('#gi-list').innerHTML = n ? list.map((g,i) => `<li><button class="gi-item ${g.id===selectedId?'is-sel':''}" type="button" data-id="${g.id}">
+      ${badge(g)}
+      <span class="gi-item-body">
+        <span class="gi-item-title">${esc(g.nome)}${you && i===0 ? '<span class="tag-near">Mais perto</span>':''}</span>
+        <span class="gi-item-meta">${esc(g.bairro)} · ${DIA_FULL[g.dia]} ${esc(g.hora)} · ${esc(g.publico)}</span>
+        <span class="gi-item-lead">${esc(g.lideres)}</span>
+      </span>
+      ${you ? `<span class="gi-dist">${fmtDist(dist(g))}</span>` : ''}
+    </button></li>`).join('')
+    : `<li class="empty">Nenhum GI com esses filtros.<br><button class="btn btn-sm" type="button" data-clear style="margin-top:10px">Limpar filtros</button></li>`;
+}
+
+function renderMapView(){ const list = filtered(); renderMap(list); renderList(list); }
+
+function selectGi(id){
+  const m = markers.get(id); if (!m) return;
+  selectedId = id; markSel();
+  if (window.matchMedia('(max-width:820px)').matches) $('#map-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+  map.setView(m.getLatLng(), Math.max(map.getZoom(), 0.25), {animate:true});
+  setTimeout(() => m.openPopup(), 260);
+}
+
+/* ---------- "perto de mim" ---------- */
+function setYou(p, fit=true){
+  you = {x:p.x, y:p.y};
+  if (!youMarker){
+    youMarker = L.marker(toLL(you.x,you.y), {icon:youIcon, draggable:true, zIndexOffset:1500, title:'Você', keyboard:false}).addTo(map);
+    youMarker.on('dragend', () => { setYou(fromLL(youMarker.getLatLng()), false); });
+    youMarker.bindTooltip && null;
+  } else youMarker.setLatLng(toLL(you.x,you.y));
+  const b = nearestBairro(you.x, you.y);
+  $('#you-status').innerHTML = `<span class="dot"></span><span>Você está perto de <b>${esc(b.n)}</b>. Arraste o ponto azul para ajustar. <button class="btn btn-ghost btn-sm" type="button" id="btn-you-clear" style="padding:2px 6px">Remover</button></span>`;
+  $('#you-bairro').value = '';
+  renderMapView();
+  const list = filtered();
+  if (fit && list.length){
+    const pts = [toLL(you.x,you.y), ...list.slice(0,3).map(g => toLL(g.x,g.y))];
+    map.flyToBounds(L.latLngBounds(pts), {padding:[70,70], maxZoom:0.75, duration:0.7});
+  }
+}
+function clearYou(){
+  you = null; if (youMarker){ map.removeLayer(youMarker); youMarker = null; }
+  $('#you-status').textContent = 'No app real: localização do celular ou CEP.';
+  $('#you-bairro').value = '';
+  renderMapView();
+}
+function setPicking(on){
+  picking = on; $('#map-wrap').classList.toggle('picking', on); $('#pick-hint').hidden = !on;
+  if (on && window.matchMedia('(max-width:820px)').matches) $('#map-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+}
+map.on('click', e => { if (picking){ setPicking(false); setYou(fromLL(e.latlng)); } });
+
+/* ---------- controls wiring ---------- */
+const youSel = $('#you-bairro'), fbSel = $('#f-bairro-sel');
+[...BAIRROS].sort((a,b)=>a.n.localeCompare(b.n,'pt')).forEach(b => {
+  youSel.insertAdjacentHTML('beforeend', `<option>${esc(b.n)}</option>`);
+  fbSel.insertAdjacentHTML('beforeend', `<option>${esc(b.n)}</option>`);
+});
+youSel.addEventListener('change', () => { const b = bairroBy(youSel.value); if (b){ setYou({x:b.x, y:b.y}); youSel.value = b.n; } });
+$('#btn-pick').addEventListener('click', () => setPicking(!picking));
+$('#btn-pick-cancel').addEventListener('click', () => setPicking(false));
+$('#q').addEventListener('input', e => { filt.q = e.target.value; renderMapView(); });
+fbSel.addEventListener('change', () => { filt.bairro = fbSel.value; renderMapView(); });
+
+function chipGroup(el, items, set, label = x => x){
+  el.innerHTML = items.map(v => `<button class="chip" type="button" aria-pressed="false" data-v="${v}">${label(v)}</button>`).join('');
+  el.addEventListener('click', e => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    const v = c.dataset.v; set.has(v) ? set.delete(v) : set.add(v);
+    c.setAttribute('aria-pressed', set.has(v)); renderMapView();
+  });
+}
+chipGroup($('#f-dias'), DIAS.map(d=>d[0]), filt.dias);
+chipGroup($('#f-pub'), PUBLICOS, filt.pub);
+
+function clearFilters(){
+  filt.q=''; filt.dias.clear(); filt.pub.clear(); filt.bairro='';
+  $('#q').value=''; fbSel.value='';
+  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed','false'));
+  renderMapView();
+}
+$('#btn-clear').addEventListener('click', clearFilters);
+
+document.addEventListener('click', e => {
+  const item = e.target.closest('.gi-item'); if (item){ selectGi(item.dataset.id); return; }
+  if (e.target.closest('[data-clear]')){ clearFilters(); return; }
+  if (e.target.closest('#btn-you-clear')){ clearYou(); return; }
+  const intr = e.target.closest('[data-interest]'); if (intr){ openInterest(intr.dataset.interest); return; }
+});
+
+/* ---------- interest modal ---------- */
+let waGi = null;
+function waMessage(){
+  const g = waGi; const lider = g.lideres.replace(/^Pr\.\s*/,'Pr. ').split(/\s+e\s+|,/)[0].trim();
+  const nome = $('#wa-nome').value.trim();
+  return `Olá, ${lider}! Vi o ${g.nome} (${g.sigla}) no app da igreja e gostaria de participar do encontro de ${DIA_FULL[g.dia].toLowerCase()} às ${g.hora}.${nome ? ` Meu nome é ${nome}.` : ''}`;
+}
+function refreshWa(){
+  const msg = waMessage(); $('#wa-msg').textContent = msg;
+  $('#wa-open').href = `https://wa.me/55${waGi.whats.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`;
+}
+function openInterest(id){
+  waGi = gis.find(g => g.id === id); if (!waGi) return;
+  const b = $('#wa-badge'); b.style.setProperty('--c', waGi.cor); b.style.setProperty('--t', textOn(waGi.cor)); b.textContent = waGi.sigla;
+  $('#wa-title').textContent = waGi.nome;
+  $('#wa-sub').textContent = `${DIA_FULL[waGi.dia]}, ${waGi.hora} · ${waGi.bairro}`;
+  $('#wa-phone').textContent = waGi.whats;
+  refreshWa(); $('#wa-modal').hidden = false; $('#wa-nome').focus();
+}
+function closeInterest(){ $('#wa-modal').hidden = true; }
+$('#wa-nome').addEventListener('input', refreshWa);
+function logInterest(){
+  const nome = $('#wa-nome').value.trim() || 'Membro do app';
+  interests.unshift({nome, gi:waGi.id, ts:Date.now()}); persist(); renderDash();
+}
+$('#wa-open').addEventListener('click', () => { logInterest(); toast('Interesse registrado no dashboard'); setTimeout(closeInterest, 150); });
+$('#wa-copy').addEventListener('click', async () => {
+  const msg = waMessage();
+  try { await navigator.clipboard.writeText(msg); toast('Mensagem copiada'); }
+  catch(e){ const r = document.createRange(); r.selectNodeContents($('#wa-msg')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Selecionei a mensagem, copie com Ctrl+C'); }
+  logInterest();
+});
+document.querySelectorAll('[data-close-modal]').forEach(b => b.addEventListener('click', closeInterest));
+$('#wa-modal').addEventListener('click', e => { if (e.target.id === 'wa-modal') closeInterest(); });
+
+/* ---------- dashboard ---------- */
+function renderDash(){
+  const total = gis.length;
+  const lideres = gis.reduce((s,g) => s + leaderCount(g), 0);
+  const part = gis.reduce((s,g) => s + (+g.participantes||0), 0);
+  const covered = new Set(gis.map(g => g.bairro));
+  const gaps = BAIRROS.filter(b => !covered.has(b.n));
+  const week = interests.filter(i => Date.now() - i.ts < 7*864e5).length;
+
+  const byPart = [...gis].sort((a,b) => b.participantes - a.participantes);
+  const maxP = Math.max(1, ...gis.map(g => g.participantes));
+  const days = DIAS.map(([d]) => ({d, n: gis.filter(g => g.dia === d).length}));
+  const maxD = Math.max(1, ...days.map(x => x.n));
+  const pubs = PUBLICOS.map((p,i) => ({p, n: gis.filter(g => g.publico === p).length, c:`var(--s${i+1})`}));
+
+  const cov = baseSvg('d');
+  cov.insertAdjacentHTML('beforeend',
+    gaps.map(b => `<circle cx="${b.x}" cy="${b.y}" r="20" class="cov-gap"/>`).join('') +
+    gis.map(g => `<circle cx="${g.x}" cy="${g.y}" r="11" class="cov-gi" fill="${g.cor}"/>`).join('') +
+    `<rect x="${CHURCH.x-11}" y="${CHURCH.y-11}" width="22" height="22" rx="5" class="cov-church"/>`);
+  cov.setAttribute('viewBox','80 80 880 720');
+  cov.setAttribute('role','img'); cov.setAttribute('aria-label','Mapa de cobertura dos GIs por bairro');
+
+  const feed = interests.slice(0,6).map(i => {
+    const g = gis.find(x => x.id === i.gi);
+    return `<li>${g ? badge(g,'sm') : '<span class="badge sm">?</span>'}<span><b>${esc(i.nome)}</b> quer participar do ${esc(g ? g.nome : 'GI removido')}${i.ex?'<span class="ex">exemplo</span>':''}</span><span class="t">${relTime(i.ts)}</span></li>`;
+  }).join('');
+
+  $('#dash').innerHTML = `
+    <div class="dash-head"><div><h2>Visão geral dos GIs</h2><p>Atualizado com o cadastro do Admin. Números de exemplo.</p></div></div>
+    <div class="kpi"><div class="eyebrow">GIs ativos</div><div class="v">${total}</div><div class="h">em ${covered.size} bairros</div></div>
+    <div class="kpi"><div class="eyebrow">Líderes</div><div class="v">${lideres}</div><div class="h">${(lideres/Math.max(1,total)).toFixed(1).replace('.',',')} por GI</div></div>
+    <div class="kpi"><div class="eyebrow">Participantes</div><div class="v">${part}</div><div class="h">média de ${Math.round(part/Math.max(1,total))} por GI</div></div>
+    <div class="kpi"><div class="eyebrow">Interessados · 7 dias</div><div class="v">${week}</div><div class="h">pedidos pelo botão "Quero participar"</div></div>
+
+    <section class="card c-7">
+      <h3>Cobertura por bairro</h3>
+      <p class="sub">${gaps.length} de ${BAIRROS.length} bairros ainda sem GI. Bons lugares para abrir novos grupos.</p>
+      <div class="cov-map" id="cov-map"></div>
+      <div class="cov-legend"><span><i class="lg-gi"></i>GI</span><span><i class="lg-church"></i>Igreja</span><span><i style="width:14px;height:14px;border-radius:50%;border:1.6px dashed var(--danger)"></i>Bairro sem GI</span></div>
+    </section>
+    <section class="card c-5">
+      <h3>Bairros sem GI</h3>
+      <p class="sub">Toque no Admin para cadastrar um GI em um deles.</p>
+      <div class="gap-chips">${gaps.map(b => `<span class="gap-chip">${esc(b.n)}</span>`).join('') || '<span class="sub">Todos os bairros têm GI.</span>'}</div>
+      <h3 style="margin-top:22px">Interessados recentes</h3>
+      <p class="sub">Cada "Quero participar" no mapa aparece aqui.</p>
+      <ul class="feed">${feed || '<li class="sub">Nenhum pedido ainda.</li>'}</ul>
+    </section>
+
+    <section class="card c-6">
+      <h3>Participantes por GI</h3>
+      <p class="sub">Ordenado do maior para o menor.</p>
+      <div class="bars">${byPart.map(g => `<div class="bar-row">${badge(g,'sm')}<span class="n">${esc(g.nome)}</span><span class="bar-track"><span class="bar-fill" style="--c:${g.cor};width:${(g.participantes/maxP*100).toFixed(1)}%;display:block"></span></span><span class="val">${g.participantes}</span></div>`).join('')}</div>
+    </section>
+    <section class="card c-6">
+      <h3>Encontros por dia da semana</h3>
+      <p class="sub">Quantos GIs se reúnem em cada dia.</p>
+      <div class="days">${days.map(x => `<div class="day ${x.n===maxD?'max':''}"><span class="cnt">${x.n}</span><span class="col" style="height:${(x.n/maxD*120).toFixed(0)}px"></span><span class="lbl">${x.d}</span></div>`).join('')}</div>
+      <h3 style="margin-top:22px">Público</h3>
+      <p class="sub">Distribuição dos GIs por público.</p>
+      <div class="seg">${pubs.filter(p=>p.n).map(p => `<span style="--c:${p.c};flex:${p.n}" title="${p.p}: ${p.n}"></span>`).join('')}</div>
+      <div class="seg-legend">${pubs.map(p => `<div style="--c:${p.c}"><i></i>${p.p}<b>${p.n}</b></div>`).join('')}</div>
+    </section>`;
+  $('#cov-map').appendChild(cov);
+}
+
+/* ---------- admin ---------- */
+let confirmId = null;
+function renderAdmin(){
+  const rows = [...gis].sort((a,b) => a.nome.localeCompare(b.nome,'pt'));
+  $('#admin-rows').innerHTML = rows.map(g => `<tr>
+    <td><span class="td-gi">${badge(g,'sm')}${esc(g.nome)}</span></td>
+    <td>${esc(g.bairro)}</td>
+    <td class="num">${g.dia} ${esc(g.hora)}</td>
+    <td>${esc(g.publico)}</td>
+    <td class="td-muted">${esc(g.lideres)}</td>
+    <td class="num">${g.participantes}</td>
+    <td><div class="td-actions">${confirmId === g.id
+      ? `<span class="confirm-txt">Excluir ${esc(g.sigla)}?</span><button class="btn btn-danger btn-sm" type="button" data-del-yes="${g.id}">Excluir</button><button class="btn btn-sm" type="button" data-del-no>Cancelar</button>`
+      : `<button class="btn btn-sm" type="button" data-edit="${g.id}">Editar</button><button class="btn btn-ghost btn-sm" type="button" data-del="${g.id}">Excluir</button>`}</div></td>
+  </tr>`).join('');
+}
+$('#admin-rows').addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.edit) openForm(t.dataset.edit);
+  else if (t.dataset.del){ confirmId = t.dataset.del; renderAdmin(); }
+  else if ('delNo' in t.dataset){ confirmId = null; renderAdmin(); }
+  else if (t.dataset.delYes){
+    const g = gis.find(x => x.id === t.dataset.delYes);
+    gis = gis.filter(x => x.id !== t.dataset.delYes); confirmId = null; persist(); renderAll(); toast(`${g.nome} excluído`);
+  }
+});
+$('#btn-new').addEventListener('click', () => openForm(null));
+$('#btn-reset').addEventListener('click', () => { gis = JSON.parse(JSON.stringify(SEED)); interests = seedInterests(); persist(); clearYou(); renderAll(); toast('Dados de exemplo restaurados'); });
+
+/* form */
+const F = id => document.getElementById(id);
+DIAS.forEach(([d,full]) => F('f-dia').insertAdjacentHTML('beforeend', `<option value="${d}">${full}</option>`));
+PUBLICOS.forEach(p => F('f-publico').insertAdjacentHTML('beforeend', `<option>${p}</option>`));
+[...BAIRROS].sort((a,b)=>a.n.localeCompare(b.n,'pt')).forEach(b => F('f-bairro').insertAdjacentHTML('beforeend', `<option>${esc(b.n)}</option>`));
+F('f-swatches').innerHTML = SWATCHES.map(c => `<button class="sw" type="button" style="--c:${c}" data-c="${c}" aria-label="Cor ${c}" aria-pressed="false"></button>`).join('') +
+  `<input type="color" id="f-cor" value="#1C6DD0" aria-label="Outra cor">`;
+let editingId = null, formPos = null, fmap = null, fmarker = null;
+
+function formGi(){ return {sigla:(F('f-sigla').value.trim().toUpperCase() || 'GI').slice(0,4), cor:F('f-cor').value}; }
+function syncPreview(){
+  const g = formGi(); const p = F('f-preview');
+  p.style.setProperty('--c', g.cor); p.style.setProperty('--t', textOn(g.cor)); p.textContent = g.sigla;
+  document.querySelectorAll('.sw').forEach(s => s.setAttribute('aria-pressed', s.dataset.c.toLowerCase() === g.cor.toLowerCase()));
+  if (fmarker) fmarker.setIcon(giIcon(g));
+}
+F('f-swatches').addEventListener('click', e => { const s = e.target.closest('.sw'); if (s){ F('f-cor').value = s.dataset.c; syncPreview(); } });
+F('f-cor').addEventListener('input', syncPreview);
+F('f-sigla').addEventListener('input', syncPreview);
+F('f-bairro').addEventListener('change', () => {
+  const b = bairroBy(F('f-bairro').value); if (!b) return;
+  formPos = {x:b.x, y:b.y}; placeFormPin(true);
+});
+function ensureFormMap(){
+  if (fmap) return;
+  fmap = L.map('fmap', {crs:L.CRS.Simple, minZoom:-2, maxZoom:2, zoomSnap:0.25, attributionControl:false});
+  L.svgOverlay(baseSvg('f'), [[0,0],[H,W]]).addTo(fmap);
+  L.marker(toLL(CHURCH.x,CHURCH.y), {icon:churchIcon(false), interactive:false}).addTo(fmap);
+  fmap.on('click', e => { formPos = fromLL(e.latlng); placeFormPin(false); });
+}
+function placeFormPin(pan){
+  const ll = toLL(formPos.x, formPos.y);
+  if (!fmarker){
+    fmarker = L.marker(ll, {draggable:true, icon:giIcon(formGi())}).addTo(fmap);
+    fmarker.on('dragend', () => { formPos = fromLL(fmarker.getLatLng()); });
+  } else { fmarker.setLatLng(ll); fmarker.setIcon(giIcon(formGi())); }
+  if (pan) fmap.setView(ll, 0.25);
+}
+function setErr(id, msg){ const e = F('e-'+id), i = F('f-'+id); e.hidden = !msg; e.textContent = msg || ''; i.classList.toggle('bad', !!msg); }
+function openForm(id){
+  editingId = id; const g = id ? gis.find(x => x.id === id) : null;
+  F('drawer-title').textContent = g ? `Editar ${g.nome}` : 'Novo GI';
+  const usedColors = new Set(gis.map(x => x.cor.toLowerCase()));
+  const freeColor = SWATCHES.find(c => !usedColors.has(c.toLowerCase())) || SWATCHES[0];
+  const b0 = bairroBy('Fundinho');
+  F('f-nome').value = g?.nome || ''; F('f-sigla').value = g?.sigla || ''; F('f-cor').value = g?.cor || freeColor;
+  F('f-bairro').value = g?.bairro || b0.n; F('f-endereco').value = g?.endereco || '';
+  F('f-dia').value = g?.dia || 'Qui'; F('f-hora').value = g?.hora || '20:00'; F('f-publico').value = g?.publico || 'Geral';
+  F('f-part').value = g?.participantes ?? 0; F('f-lideres').value = g?.lideres || ''; F('f-whats').value = g?.whats || '';
+  formPos = g ? {x:g.x, y:g.y} : {x:b0.x, y:b0.y};
+  setErr('nome'); setErr('sigla');
+  $('#drawer').hidden = false; ensureFormMap(); syncPreview();
+  setTimeout(() => { fmap.invalidateSize(); placeFormPin(true); F('f-nome').focus(); }, 40);
+}
+function closeForm(){ $('#drawer').hidden = true; }
+document.querySelectorAll('[data-close-drawer]').forEach(b => b.addEventListener('click', closeForm));
+$('#drawer').addEventListener('click', e => { if (e.target.id === 'drawer') closeForm(); });
+$('#gi-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const nome = F('f-nome').value.trim(); const sigla = F('f-sigla').value.trim().toUpperCase();
+  let ok = true;
+  if (!nome){ setErr('nome','Informe o nome do GI.'); ok = false; } else setErr('nome');
+  if (!/^[A-Z0-9ÁÉÍÓÚÂÊÔÃÕÇ]{1,4}$/.test(sigla)){ setErr('sigla','Use de 1 a 4 letras, sem espaço.'); ok = false; }
+  else if (gis.some(g => g.sigla === sigla && g.id !== editingId)){ setErr('sigla',`A sigla ${sigla} já é usada por outro GI.`); ok = false; }
+  else setErr('sigla');
+  if (!ok) return;
+  const data = {nome, sigla, cor:F('f-cor').value.toUpperCase(), bairro:F('f-bairro').value, endereco:F('f-endereco').value.trim() || 'Endereço a definir',
+    dia:F('f-dia').value, hora:F('f-hora').value || '20:00', publico:F('f-publico').value, lideres:F('f-lideres').value.trim() || 'Líder a definir',
+    whats:F('f-whats').value.trim() || '(34) 99999-0000', participantes:Math.max(0, parseInt(F('f-part').value,10) || 0),
+    x:Math.round(formPos.x), y:Math.round(formPos.y)};
+  if (editingId) Object.assign(gis.find(g => g.id === editingId), data);
+  else gis.push({id:'g' + Date.now().toString(36), ...data});
+  persist(); closeForm(); renderAll(); toast(`${nome} salvo. Já aparece no mapa.`);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ if (!$('#wa-modal').hidden) closeInterest(); else if (!$('#drawer').hidden) closeForm(); else if (picking) setPicking(false); } });
+
+/* ---------- tabs ---------- */
+function show(view){
+  ['mapa','dashboard','admin'].forEach(v => {
+    $('#view-'+v).hidden = v !== view;
+    $('#tab-'+v).setAttribute('aria-selected', v === view);
+  });
+  if (view === 'mapa') setTimeout(() => map.invalidateSize(), 0);
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.view)));
+
+function renderAll(){ renderMapView(); renderDash(); renderAdmin(); }
+renderAll();
+const h = (location.hash || '').slice(1);
+show(['dashboard','admin'].includes(h) ? h : 'mapa');
+})();
+</script>
