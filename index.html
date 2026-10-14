@@ -493,7 +493,7 @@ const CITY = {lat:-18.9186, lng:-48.2772};
 const BAIRROS = [
   {n:'Centro',lat:-18.9186,lng:-48.2772},{n:'Fundinho',lat:-18.9238,lng:-48.2800},{n:'Martins',lat:-18.9130,lng:-48.2850},
   {n:'Osvaldo Rezende',lat:-18.9060,lng:-48.2860},{n:'Brasil',lat:-18.9060,lng:-48.2700},{n:'Presidente Roosevelt',lat:-18.8880,lng:-48.2830},
-  {n:'Jardim Brasília',lat:-18.8870,lng:-48.2650},{n:'Umuarama',lat:-18.8960,lng:-48.2560},{n:'Tibery',lat:-18.9050,lng:-48.2440},
+  {n:'Jardim Brasília',lat:-18.8870,lng:-48.2650},{n:'Umuarama',lat:-18.8960,lng:-48.2560},{n:'Tibery',lat:-18.9080,lng:-48.2585},{n:'Grand Ville',lat:-18.9090,lng:-48.2320},
   {n:'Santa Mônica',lat:-18.9230,lng:-48.2530},{n:'Segismundo Pereira',lat:-18.9300,lng:-48.2350},{n:'Saraiva',lat:-18.9370,lng:-48.2700},
   {n:'Lídice',lat:-18.9290,lng:-48.2880},{n:'Jardim Karaíba',lat:-18.9560,lng:-48.2640},{n:'Granada',lat:-18.9560,lng:-48.2950},
   {n:'Laranjeiras',lat:-18.9650,lng:-48.2820},{n:'Planalto',lat:-18.9320,lng:-48.3200},{n:'Luizote de Freitas',lat:-18.9150,lng:-48.3380},
@@ -507,6 +507,12 @@ const near = (n, dLat, dLng) => { const b = bairroBy(n); return {lat:+(b.lat + d
 const SEED = [
   {id:'gv', sigla:'GV', nome:'GI Vida', cor:'#1C6DD0', bairro:'Santa Mônica', ...near('Santa Mônica',0.0012,-0.0016), cep:'', endereco:'Rua das Acácias, 120', dia:'Qui', hora:'20:00', publico:'Geral', lideres:'Carlos e Ana Ribeiro', whats:'(34) 99999-0101', participantes:14},
   {id:'glz', sigla:'GLZ', nome:'GI Luz', cor:'#D9480F', bairro:'Tibery', ...near('Tibery',-0.0010,0.0012), cep:'', endereco:'Rua Ipê Amarelo, 455', dia:'Ter', hora:'19:30', publico:'Casais', lideres:'Marcos e Júlia Prado', whats:'(34) 99999-0102', participantes:10},
+  {id:'gg', sigla:'GG', nome:'GI Graça', cor:'#087F5B', bairro:'Tibery', ...near('Tibery',0.0025,-0.0030), cep:'', endereco:'Rua Salvador, 210', dia:'Qua', hora:'20:00', publico:'Geral', lideres:'Renato e Priscila Alves', whats:'(34) 99999-0114', participantes:13},
+  {id:'go', sigla:'GO', nome:'GI Oásis', cor:'#A61E4D', bairro:'Tibery', ...near('Tibery',-0.0035,-0.0020), cep:'', endereco:'Rua da Bandeira, 98', dia:'Seg', hora:'19:30', publico:'Mulheres', lideres:'Fernanda Rocha', whats:'(34) 99999-0115', participantes:8},
+  {id:'gav', sigla:'GAV', nome:'GI Avivar', cor:'#E8590C', bairro:'Tibery', ...near('Tibery',0.0030,0.0030), cep:'', endereco:'Rua Recife, 345', dia:'Sex', hora:'20:00', publico:'Jovens', lideres:'Gustavo Lima e Ana Clara Reis', whats:'(34) 99999-0116', participantes:19},
+  {id:'gpz', sigla:'GPZ', nome:'GI Paz', cor:'#5F3DC4', bairro:'Tibery', ...near('Tibery',-0.0010,-0.0045), cep:'', endereco:'Rua Belém, 77', dia:'Sáb', hora:'19:30', publico:'Casais', lideres:'Rodrigo e Camila Teixeira', whats:'(34) 99999-0117', participantes:12},
+  {id:'gc', sigla:'GC', nome:'GI Caminho', cor:'#1971C2', bairro:'Grand Ville', ...near('Grand Ville',0.0015,0.0010), cep:'', endereco:'Rua Aquarela, 150', dia:'Ter', hora:'20:00', publico:'Geral', lideres:'Daniel e Patrícia Moura', whats:'(34) 99999-0118', participantes:11},
+  {id:'gst', sigla:'GST', nome:'GI Sal da Terra', cor:'#E67700', bairro:'Grand Ville', ...near('Grand Ville',-0.0020,-0.0025), cep:'', endereco:'Rua Singela, 60', dia:'Qui', hora:'19:30', publico:'Casais', lideres:'Henrique e Larissa Campos', whats:'(34) 99999-0119', participantes:9},
   {id:'gf', sigla:'GF', nome:'GI Fé', cor:'#7A3FC4', bairro:'Centro', ...near('Centro',0.0022,-0.0018), cep:'', endereco:'Rua Olegário Maciel, 88', dia:'Qua', hora:'20:00', publico:'Geral', lideres:'Pr. Roberto Alves', whats:'(34) 99999-0103', participantes:18},
   {id:'gja', sigla:'GJA', nome:'GI Jovens Atos', cor:'#C2255C', bairro:'Umuarama', ...near('Umuarama',0.0008,0.0015), cep:'', endereco:'Rua Quintino Bocaiúva, 900', dia:'Sáb', hora:'19:00', publico:'Jovens', lideres:'Lucas Martins e Bia Souza', whats:'(34) 99999-0104', participantes:22},
   {id:'gr', sigla:'GR', nome:'GI Renovo', cor:'#0E8A6A', bairro:'Martins', ...near('Martins',0.0010,0.0008), cep:'', endereco:'Rua Bernardo Guimarães, 310', dia:'Seg', hora:'20:00', publico:'Mulheres', lideres:'Débora Lima', whats:'(34) 99999-0105', participantes:9},
@@ -519,10 +525,10 @@ const SEED = [
   {id:'gsh', sigla:'GSH', nome:'GI Shalom', cor:'#495057', bairro:'Laranjeiras', ...near('Laranjeiras',0.0010,0.0010), cep:'', endereco:'Rua Laranja-Lima, 150', dia:'Qua', hora:'20:00', publico:'Mulheres', lideres:'Cláudia Prado', whats:'(34) 99999-0112', participantes:10},
   {id:'gm', sigla:'GM', nome:'GI Maná', cor:'#0B7A94', bairro:'Jardim Brasília', ...near('Jardim Brasília',0.0010,-0.0010), cep:'', endereco:'Rua Brasília, 501', dia:'Qui', hora:'20:00', publico:'Geral', lideres:'Edson e Sônia Batista', whats:'(34) 99999-0113', participantes:9}
 ];
-const CHURCH = {nome:'Igreja Sede', endereco:'Centro · Uberlândia (posição de exemplo)', culto:'Domingos 9h e 19h', lat:-18.9165, lng:-48.2735};
+const CHURCH = {nome:'Igreja Sede', endereco:'Av. Rui de Castro Santos, 1991 · Grand Ville · CEP 38407-847', culto:'Domingos 9h e 19h', lat:-18.9065, lng:-48.2275};
 
 /* ---------- storage ---------- */
-const KEY = 'mapa-gis-proto-v2';
+const KEY = 'mapa-gis-proto-v3';
 function load(){ try{ const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
 function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({gis, interests})); }catch(e){} }
 function seedInterests(){
