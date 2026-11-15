@@ -121,12 +121,29 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 
 /* results */
 .results{padding-block:18px 40px}
-.group{margin-bottom:30px}
+.acc-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.acc-tools p{margin:0;color:var(--ink-2);font-size:13.5px}
+.acc-tools div{display:flex;gap:6px}
+.group{margin-bottom:10px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden;scroll-margin-top:150px}
+.group.open{border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
+.acc-h{width:100%;border:0;background:none;padding:12px 14px;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;color:var(--ink)}
+.acc-h:hover{background:color-mix(in srgb,var(--c) 6%,var(--surface))}
+.acc-h>div{flex:1;min-width:0}
+.peek{display:flex;flex:none}
+.peek .thumb{width:40px;height:28px;border-radius:7px;border:2px solid var(--surface);margin-left:-10px;font-size:10px}
+.peek .thumb:first-child{margin-left:0}
+.peek .more{width:28px;height:28px;border-radius:50%;margin-left:-8px;background:var(--surface-2);border:2px solid var(--surface);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--ink-2)}
+.chev{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);flex:none;transition:transform .2s}
+.group.open .chev{transform:rotate(180deg);background:color-mix(in srgb,var(--c) 15%,var(--surface))}
+.group .grid{padding:4px 14px 16px}
+.group:not(.open) .grid{display:none}
+.group:not(.open) .acc-h small .hint-open::after{content:" · toque para ver"}
 .group-h{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.group-h .ti{--c:#888;width:36px;height:36px;border-radius:11px;background:var(--c);color:#fff;display:grid;place-items:center;flex:none}
-.group-h .ti svg{width:19px;height:19px}
-.group-h h3{font-size:19px}
-.group-h small{color:var(--ink-2);font-size:13px;display:block}
+.acc-h .ti,.group-h .ti{--c:#888;width:36px;height:36px;border-radius:11px;background:var(--c);color:#fff;display:grid;place-items:center;flex:none}
+.acc-h .ti svg,.group-h .ti svg{width:19px;height:19px}
+.acc-h h3,.group-h h3{font-size:18px}
+.acc-h small,.group-h small{color:var(--ink-2);font-size:13px;display:block}
+@media (max-width:560px){.peek{display:none}}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .card{--c:#888;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px 16px 14px;display:flex;flex-direction:column;gap:9px;min-width:0;position:relative;overflow:hidden}
 .cover{--bg:#000;margin:-15px -16px 2px;height:160px;background:var(--bg);display:grid;place-items:center;overflow:hidden;cursor:pointer;border:0;padding:0;width:calc(100% + 32px);position:relative}
@@ -217,6 +234,125 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:4000;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
 .foot{color:var(--ink-2);font-size:12.5px;padding-block:20px 30px;border-top:1px solid var(--line)}
 
+/* abas principais */
+.ptabs{display:flex;background:var(--surface-2);border-radius:12px;padding:4px;gap:2px}
+.ptab{border:0;background:none;padding:7px 13px;border-radius:9px;font-weight:600;font-size:14px;color:var(--ink-2);display:inline-flex;gap:6px;align-items:center}
+.ptab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.note{background:var(--warn-soft);border-radius:12px;padding:10px 14px;font-size:13.5px;display:flex;gap:10px;align-items:flex-start}
+.note svg{margin-top:2px}
+
+/* dashboard */
+.dash{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;padding-block:8px 40px}
+.page-head{grid-column:1/-1;display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;padding-top:14px}
+.page-head h1{font-size:clamp(24px,3.5vw,32px)}
+.page-head p{margin:4px 0 0;color:var(--ink-2)}
+.kpi{grid-column:span 3;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.kpi .v{font:800 34px/1.1 var(--f-display);font-variant-numeric:tabular-nums;margin-top:6px}
+.kpi .h{font-size:13px;color:var(--ink-2)}
+.kpi.warnk .v{color:var(--danger)}
+.dcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.dcard h3{font-size:17px}
+.dcard .sub{font-size:13px;color:var(--ink-2);margin:2px 0 14px}
+.c-7{grid-column:span 7}.c-5{grid-column:span 5}.c-6{grid-column:span 6}.c-12{grid-column:1/-1}
+.hbars{display:flex;flex-direction:column;gap:7px}
+.hbar{display:grid;grid-template-columns:24px minmax(0,190px) minmax(0,1fr) 30px;gap:10px;align-items:center;font-size:13.5px;border:0;background:none;padding:2px 0;text-align:left;border-radius:6px}
+.hbar:hover .track i{filter:brightness(1.1)}
+.hbar .ti{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 15%,var(--surface));color:var(--c)}
+.hbar .ti svg{width:14px;height:14px}
+.hbar .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{height:12px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.track i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--accent)}
+.hbar .val{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.stack{display:flex;height:16px;border-radius:999px;overflow:hidden;gap:2px;margin:6px 0 12px}
+.stack span{background:var(--c)}
+.leg{display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.leg div{display:flex;align-items:center;gap:8px}
+.leg i{width:11px;height:11px;border-radius:3px;background:var(--c);flex:none}
+.leg b{margin-left:auto;font-variant-numeric:tabular-nums}
+.issues{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.issues li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.issues li:first-child{border-top:0;padding-top:0}
+.issues .nm{font-weight:700}
+.issues .tags{margin-top:3px}
+.flag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--warn-soft);color:var(--ink)}
+.flag.red{background:var(--danger-soft,#FBE4E1);color:var(--danger)}
+.thumb{width:56px;height:38px;border-radius:8px;overflow:hidden;background:var(--bg);display:grid;place-items:center;flex:none;position:relative}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.thumb.gen{background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#000));color:#fff;font:800 12px var(--f-display)}
+
+/* admin */
+.admin{padding-block:8px 40px;display:flex;flex-direction:column;gap:14px}
+.admin-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.admin-tools input,.admin-tools select{padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:14px;min-width:0}
+.admin-tools input{flex:1 1 220px}
+.admin-tools .sp{flex:1}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.atable{width:100%;border-collapse:collapse;font-size:14px;min-width:880px}
+.atable th{text-align:left;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.atable td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.atable tr:last-child td{border-bottom:0}
+.atable tr.off td{opacity:.55}
+.atable tr.off td:last-child,.atable tr.off td:nth-last-child(2){opacity:1}
+.atable .nm{font-weight:700}
+.atable .mini{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.atable .mini .tag{font-size:10.5px;padding:1px 7px}
+.atable .muted{color:var(--ink-2);font-size:13px}
+.atable .tel{font-variant-numeric:tabular-nums;white-space:nowrap}
+.sw-wrap{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;border:0;background:none;padding:4px;border-radius:999px;color:var(--ink-2)}
+.switch{width:38px;height:22px;border-radius:999px;background:var(--line);position:relative;transition:background .15s;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgb(0 0 0/.25);transition:transform .15s}
+[aria-checked="true"] .switch{background:var(--accent)}
+[aria-checked="true"] .switch::after{transform:translateX(16px)}
+[aria-checked="true"]{color:var(--ink)}
+
+/* drawer */
+.drawer-scrim{justify-content:flex-end;align-items:stretch;padding:0}
+.drawer{width:min(1000px,100%);height:100%;background:var(--bg);border-left:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) 330px;grid-template-rows:auto minmax(0,1fr) auto;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.dr-head{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.dr-head h2{font-size:20px;flex:1;min-width:0}
+.dr-body{overflow:auto;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start}
+.dr-prev{overflow:auto;padding:18px;border-left:1px solid var(--line);background:var(--surface-2)}
+.dr-prev .card{pointer-events:none}
+.dr-foot{grid-column:1/-1;display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--line);background:var(--surface);align-items:center;flex-wrap:wrap}
+.dr-foot .sp{flex:1}
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld.full{grid-column:1/-1}
+.fld>label,.fld .lab{font-size:13px;font-weight:700}
+.fld input,.fld textarea,.fld select{padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:14.5px;min-width:0;width:100%}
+.fld textarea{min-height:120px;resize:vertical;line-height:1.5}
+.fld .hint{font-size:12px;color:var(--ink-2)}
+.fld .err{font-size:12.5px;color:var(--danger);font-weight:600}
+.fld .bad{border-color:var(--danger)}
+.pick{display:flex;flex-wrap:wrap;gap:6px}
+.pick button{--c:var(--accent);border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px 5px 7px;font-size:13px;font-weight:600;display:inline-flex;gap:6px;align-items:center;color:var(--ink)}
+.pick button.np{padding-left:11px}
+.pick button .ti{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 15%,var(--surface));color:var(--c)}
+.pick button .ti svg{width:13px;height:13px}
+.pick button[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,var(--surface))}
+.pick button[aria-pressed="true"] .ti{background:var(--c);color:#fff}
+.pick button small{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--c)}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center}
+.crow+.crow{margin-top:8px}
+.img-box{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.img-box .thumb{width:120px;height:80px;border-radius:12px}
+.img-box .acts{display:flex;gap:6px;flex-wrap:wrap}
+.danger-zone{border:1px dashed color-mix(in srgb,var(--danger) 50%,transparent);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn-danger:hover{background:var(--danger);filter:brightness(1.08)}
+@media (max-width:860px){
+  .drawer{grid-template-columns:minmax(0,1fr)}
+  .dr-prev{display:none}
+}
+@media (max-width:1000px){.kpi{grid-column:span 6}.c-7,.c-5,.c-6{grid-column:1/-1}}
+@media (max-width:560px){
+  .dr-body{grid-template-columns:minmax(0,1fr)}
+  .crow{grid-template-columns:minmax(0,1fr) auto}
+  .crow .c-name{grid-column:1/-1}
+  .hbar{grid-template-columns:24px minmax(0,1fr) 70px 26px}
+  .ptabs{width:100%}.ptab{flex:1;justify-content:center}
+}
+
 @media (max-width:820px){
   .hero{grid-template-columns:minmax(0,1fr)}
   .bar .count{margin-left:0;flex-basis:100%}
@@ -239,6 +375,11 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stro
     <div class="brand-mark" aria-hidden="true">IM</div>
     <div><b>Ministérios</b><span>Imagine Uberlândia · protótipo</span></div>
   </div>
+  <nav class="ptabs" role="tablist" aria-label="Seções">
+    <button class="ptab" role="tab" data-tab="explorar" aria-selected="true">Explorar</button>
+    <button class="ptab" role="tab" data-tab="dashboard" aria-selected="false">Dashboard</button>
+    <button class="ptab" role="tab" data-tab="admin" aria-selected="false">Admin</button>
+  </nav>
   <a class="btn btn-ghost btn-sm hide-sm" href="../index.html">
     <svg class="i" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0119 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Mapa dos GIs</a>
   <button class="btn btn-sm" type="button" id="btn-favs" aria-pressed="false">
@@ -248,6 +389,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 </header>
 
 <main>
+<div id="view-explorar">
   <section class="wrap hero">
     <div>
       <span class="eyebrow" id="hero-eyebrow">77 ministérios · 15 áreas</span>
@@ -301,9 +443,83 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stro
   <section class="wrap results" id="results" aria-live="polite"></section>
 
   <footer class="wrap foot">
-    Protótipo com os ministérios do site atual da Imagine Uberlândia. Contatos copiados da página "Nossos Ministérios". Favoritos ficam salvos só neste aparelho.
+    Protótipo com os ministérios do site atual da Imagine Uberlândia. Contatos copiados da página "Nossos Ministérios". Favoritos e alterações do Admin ficam salvos só neste navegador.
   </footer>
+</div>
+
+<section class="wrap" id="view-dashboard" hidden>
+  <div class="dash" id="dash"></div>
+</section>
+
+<section class="wrap" id="view-admin" hidden>
+  <div class="admin">
+    <div class="page-head" style="padding-top:14px">
+      <div><h1>Administrar ministérios</h1><p>Crie, edite, desative ou reative ministérios. As mudanças aparecem na hora em Explorar.</p></div>
+      <button class="btn btn-primary" type="button" id="a-new"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Novo ministério</button>
+    </div>
+    <div class="note"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg>
+      <span>Protótipo: as alterações ficam salvas só neste navegador. Use <b>Exportar</b> para guardar um arquivo com os dados. No sistema real, o Admin terá login e as mudanças valem para todos.</span></div>
+    <div class="admin-tools">
+      <input id="a-q" type="search" placeholder="Buscar por nome, responsável ou telefone" aria-label="Buscar no admin">
+      <select id="a-status" aria-label="Status"><option value="">Todos os status</option><option value="on">Ativos</option><option value="off">Desativados</option><option value="issue">Com pendência</option></select>
+      <select id="a-area" aria-label="Área"><option value="">Todas as áreas</option></select>
+      <span class="sp"></span>
+      <button class="btn btn-sm" type="button" id="a-export"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Exportar</button>
+      <label class="btn btn-sm" for="a-import" style="cursor:pointer"><svg class="i" viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>Importar</label>
+      <input type="file" id="a-import" accept="application/json,.json" hidden>
+      <button class="btn btn-sm btn-ghost" type="button" id="a-reset">Restaurar original</button>
+    </div>
+    <div class="table-wrap">
+      <table class="atable">
+        <thead><tr><th>Arte</th><th>Ministério</th><th>Responsável</th><th>Contato</th><th>Tipo</th><th>Status</th><th></th></tr></thead>
+        <tbody id="a-rows"></tbody>
+      </table>
+    </div>
+    <p class="muted" id="a-count" style="margin:0;font-size:13px;color:var(--ink-2)"></p>
+  </div>
+</section>
 </main>
+
+<!-- editor do admin -->
+<div class="scrim drawer-scrim" id="e-scrim" style="z-index:3200" hidden>
+  <form class="drawer" id="e-form" novalidate role="dialog" aria-modal="true" aria-labelledby="e-title">
+    <div class="dr-head">
+      <h2 id="e-title">Editar ministério</h2>
+      <button class="btn btn-ghost btn-icon" type="button" data-e-close aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dr-body">
+      <div class="fld"><label for="e-n">Nome do ministério</label><input id="e-n" placeholder="Ex.: Worship" maxlength="60"><span class="err" id="er-n" hidden></span></div>
+      <div class="fld"><span class="lab">Status</span>
+        <button type="button" class="sw-wrap" id="e-ativo" role="switch" aria-checked="true"><span class="switch"></span><span id="e-ativo-t">Ativo: aparece para os membros</span></button></div>
+      <div class="fld full"><label for="e-d">Descrição</label><textarea id="e-d" placeholder="O que o ministério faz, quando se reúne e como entrar."></textarea>
+        <span class="hint" id="e-d-c"></span><span class="err" id="er-d" hidden></span></div>
+      <div class="fld full"><span class="lab">Áreas de interesse</span><span class="hint">A primeira escolhida é a principal (define a cor). Escolha até 3.</span><div class="pick" id="e-g"></div><span class="err" id="er-g" hidden></span></div>
+      <div class="fld"><span class="lab">Tipo</span><div class="pick" id="e-m"></div></div>
+      <div class="fld"><span class="lab">Feito para</span><span class="hint">Deixe vazio se for para todos.</span><div class="pick" id="e-p"></div></div>
+      <div class="fld full"><label for="e-r">Responsável</label><input id="e-r" placeholder="Ex.: Pra. Kelle"><span class="err" id="er-r" hidden></span></div>
+      <div class="fld full"><span class="lab">Contatos (WhatsApp)</span><div id="e-c"></div>
+        <button class="btn btn-sm btn-ghost" type="button" id="e-c-add" style="align-self:flex-start">+ Adicionar contato</button>
+        <span class="hint">Use DDD + 9 dígitos. Ex.: (34) 99999-0000.</span></div>
+      <div class="fld"><label for="e-lt">Botão extra (texto)</label><input id="e-lt" placeholder="Ex.: Entrar no grupo do WhatsApp"></div>
+      <div class="fld"><label for="e-lu">Botão extra (link)</label><input id="e-lu" inputmode="url" placeholder="https://..."><span class="err" id="er-lu" hidden></span></div>
+      <div class="fld full"><label for="e-t">Palavras para a busca</label><input id="e-t" placeholder="Ex.: violão bateria cantar"><span class="hint">Palavras que as pessoas digitariam para achar este ministério.</span></div>
+      <div class="fld full"><span class="lab">Arte do ministério</span>
+        <div class="img-box"><div id="e-img-prev"></div>
+          <div class="acts">
+            <label class="btn btn-sm" for="e-img" style="cursor:pointer">Enviar imagem</label>
+            <input type="file" id="e-img" accept="image/*" hidden>
+            <button class="btn btn-sm btn-ghost" type="button" id="e-img-gen">Usar capa colorida</button>
+            <button class="btn btn-sm btn-ghost" type="button" id="e-img-orig" hidden>Voltar à arte original</button>
+          </div></div>
+        <span class="hint">A imagem é reduzida automaticamente para carregar rápido.</span></div>
+      <div class="fld full" id="e-del-zone"><div class="danger-zone"><span style="flex:1">Excluir apaga o ministério de vez. Para só esconder dos membros, desative.</span>
+        <button class="btn btn-sm" type="button" id="e-del">Excluir ministério</button></div></div>
+    </div>
+    <aside class="dr-prev" aria-label="Pré-visualização"><span class="eyebrow">Como os membros vão ver</span><div id="e-prev" style="margin-top:10px"></div></aside>
+    <div class="dr-foot"><span class="hint" id="e-msg" style="font-size:13px;color:var(--ink-2)"></span><span class="sp"></span>
+      <button class="btn" type="button" data-e-close>Cancelar</button><button class="btn btn-primary" type="submit">Salvar</button></div>
+  </form>
+</div>
 
 <!-- detalhe -->
 <div class="scrim" id="m-scrim" style="z-index:3100" hidden>
@@ -525,13 +741,32 @@ const slug = s => norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const icon = (id, cls='i') => `<svg class="${cls}" viewBox="0 0 24 24">${I[id]}</svg>`;
 const STAR = '<svg class="i" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>';
 const WA = '<svg class="i" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4.1A8.5 8.5 0 1 1 8 19.6z"/></svg>';
-M.forEach(m => {
-  m.id = slug(m.n);
+/* ================= dados editáveis (Admin) ================= */
+const SEED = M.map(m => ({...m, id: slug(m.n), ativo: true}));
+const DKEY = 'imagine-ministerios-dados-v1';
+const DERIVED = ['c0','ini','hay','_direct','short'];
+const strip = m => Object.fromEntries(Object.entries(m).filter(([k]) => !DERIVED.includes(k)));
+function prep(m){
+  m.g = (m.g || []).filter(g => AREA[g]); if (!m.g.length) m.g = ['bastidores'];
+  m.p = m.p || []; m.c = (m.c || []).filter(c => c && (c[1] || '').trim()); m.t = m.t || ''; m.m = m.m || 'a';
   m.c0 = AREA[m.g[0]].c;
-  m.ini = m.n.replace(/^(IM\.?\s*)/,'').split(/\s+/).filter(w => w.length > 2 || /^[A-Z]/.test(w)).slice(0,2).map(w => w[0]).join('').toUpperCase() || m.n.slice(0,2).toUpperCase();
-  m.hay = {n:norm(m.n), t:norm(m.t), d:norm(m.d), r:norm(m.r), g:m.g.map(g => norm(AREA[g].n + ' ' + AREA[g].k)).join(' ')};
-});
-const BY = Object.fromEntries(M.map(m => [m.id, m]));
+  m.ini = m.n.split(/\s+/).filter(w => w.length > 2 || /^[A-Z]/.test(w)).slice(0,2).map(w => w[0]).join('').toUpperCase() || m.n.slice(0,2).toUpperCase();
+  m.hay = {n:norm(m.n), t:norm(m.t), d:norm(m.d), r:norm(m.r + ' ' + m.c.map(c => c[1].replace(/\D/g,'')).join(' ')), g:m.g.map(g => norm(AREA[g].n + ' ' + AREA[g].k)).join(' ')};
+  m.short = (m.d || '').trim().length < 40;
+}
+let DATA = null;
+try { DATA = JSON.parse(localStorage.getItem(DKEY) || 'null'); } catch(e){}
+if (!Array.isArray(DATA) || !DATA.length) DATA = JSON.parse(JSON.stringify(SEED));
+let BY = {};
+function reindex(){ DATA.forEach(prep); BY = Object.fromEntries(DATA.map(m => [m.id, m])); }
+reindex();
+const ACT = () => DATA.filter(m => m.ativo !== false);
+function saveData(){
+  try { localStorage.setItem(DKEY, JSON.stringify(DATA.map(strip))); return true; }
+  catch(e){ toast('Não deu para salvar: o navegador ficou sem espaço. Tente uma imagem menor.'); return false; }
+}
+const artSrc = m => m.img || (!m.noArt && IMG[m.id] ? `img/${m.id}.jpg` : '');
+const artBg = m => m.img ? (m.imgBg || '#111') : IMG[m.id];
 const digits = s => s.replace(/\D/g,'');
 const phoneOk = s => { const d = digits(s); return d.length === 11 && d[2] === '9'; };
 const firstName = s => s.replace(/^(Pr\.|Pra\.|Pastora|Pastor)\s*/i,'').split(/\s+e\s+|\s+/)[0];
@@ -558,7 +793,7 @@ function search(q){
   const toks = norm(q).split(/[^a-z0-9+]+/).filter(t => t.length >= 2);
   if (!toks.length) return null;
   const out = [];
-  for (const m of M){
+  for (const m of ACT()){
     let score = 0, ok = true;
     for (const t of toks){
       let s = 0;
@@ -589,10 +824,26 @@ function hl(text, q){
 
 /* ================= state ================= */
 const st = {q:'', areas:new Set(), mode:'', pub:'', view:'grupos', favs:false};
+/* áreas abertas no modo "Por área" (lembradas neste aparelho) */
+const OKEY = 'imagine-ministerios-abertas';
+let openAreas = new Set();
+try { openAreas = new Set(JSON.parse(localStorage.getItem(OKEY) || '[]')); } catch(e){}
+const closedSel = new Set(); // áreas filtradas que a pessoa fechou
+const saveOpen = () => { try { localStorage.setItem(OKEY, JSON.stringify([...openAreas])); } catch(e){} };
+function toggleArea(id){
+  if (st.areas.size){ closedSel.has(id) ? closedSel.delete(id) : closedSel.add(id); }
+  else { openAreas.has(id) ? openAreas.delete(id) : openAreas.add(id); saveOpen(); }
+  renderResults();
+  const sec = document.getElementById('g-' + id);
+  if (sec && sec.classList.contains('open')){
+    const top = sec.getBoundingClientRect().top;
+    if (top < 120 || top > window.innerHeight * 0.6) sec.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
 const modeOk = m => !st.mode || m.m === 'a' || m.m === st.mode;
 const pubOk = m => !st.pub || m.p.includes(st.pub);
 function base(){ // everything except areas
-  let list = st.q ? (search(st.q) || []) : [...M];
+  let list = st.q ? (search(st.q) || []) : ACT();
   return list.filter(m => modeOk(m) && pubOk(m) && (!st.favs || favs.has(m.id)));
 }
 function current(){
@@ -613,8 +864,9 @@ function renderTiles(){
 /* ================= render: cards ================= */
 function cover(m, cls=''){
   const gen = `<div class="cover gen ${cls}" style="--c:${m.c0}"${cls ? '' : ` data-open="${m.id}" role="button" tabindex="-1"`}><span class="gm">im.</span>${icon(m.g[0])}<b>${esc(m.n)}</b></div>`;
-  if (!IMG[m.id]) return gen;
-  return `<div class="cover ${cls}" style="--bg:${IMG[m.id]}"${cls ? '' : ` data-open="${m.id}" role="button" tabindex="-1"`}><img src="img/${m.id}.jpg" alt="Arte do ministério ${esc(m.n)}" loading="lazy" data-gen="${esc(gen)}"></div>`;
+  const src = artSrc(m);
+  if (!src) return gen;
+  return `<div class="cover ${cls}" style="--bg:${artBg(m)}"${cls ? '' : ` data-open="${m.id}" role="button" tabindex="-1"`}><img src="${src}" alt="Arte do ministério ${esc(m.n)}" loading="lazy" data-gen="${esc(gen)}"></div>`;
 }
 // imagem não encontrada → troca pela capa gerada
 document.addEventListener('error', e => {
@@ -624,7 +876,7 @@ document.addEventListener('error', e => {
   box.replaceWith(g);
 }, true);
 function card(m, opts={}){
-  const tel = m.c[0][1];
+  const tel = m.c[0] ? m.c[0][1] : '';
   const why = opts.why ? `<div class="why">${opts.why}</div>` : '';
   const q = st.q;
   return `<article class="card" style="--c:${m.c0}">
@@ -659,7 +911,7 @@ function renderActive(){
 function renderResults(){
   const list = current();
   const n = list.length;
-  $('#count').innerHTML = `<b>${n}</b> ${n === 1 ? 'ministério' : 'ministérios'}${n !== M.length ? ` de ${M.length}` : ''}`;
+  $('#count').innerHTML = `<b>${n}</b> ${n === 1 ? 'ministério' : 'ministérios'}${n !== ACT().length ? ` de ${ACT().length}` : ''}`;
   const R = $('#results');
   if (!n){
     const sug = AREAS.filter(a => base().some(m => m.g.includes(a.id))).slice(0,4);
@@ -683,15 +935,29 @@ function renderResults(){
     return;
   }
   const areas = st.areas.size ? AREAS.filter(a => st.areas.has(a.id)) : AREAS;
-  R.innerHTML = areas.map(a => {
+  const isOpen = id => st.areas.size ? !closedSel.has(id) : openAreas.has(id);
+  const shown = areas.filter(a => list.some(m => m.g.includes(a.id)));
+  const anyClosed = shown.some(a => !isOpen(a.id)), anyOpen = shown.some(a => isOpen(a.id));
+  R.innerHTML = `<div class="acc-tools"><p>Toque em uma área para ver os ministérios dela.</p><div>
+      <button class="btn btn-sm" type="button" data-accall="open" ${anyClosed ? '' : 'disabled'}>Abrir todas</button>
+      <button class="btn btn-sm" type="button" data-accall="close" ${anyOpen ? '' : 'disabled'}>Fechar todas</button></div></div>` +
+    shown.map(a => {
     const items = list.filter(m => m.g.includes(a.id)).sort((x,y) => (x.g[0] === a.id ? 0 : 1) - (y.g[0] === a.id ? 0 : 1) || x.n.localeCompare(y.n,'pt'));
-    if (!items.length) return '';
-    return `<section class="group" id="g-${a.id}"><div class="group-h"><span class="ti" style="--c:${a.c}">${icon(a.id)}</span><div><h3>${a.n}</h3><small>${items.length} ${items.length === 1 ? 'ministério' : 'ministérios'} · ${a.h}</small></div></div>
-      <div class="grid">${items.map(m => card(m)).join('')}</div></section>`;
+    const open = isOpen(a.id);
+    const peek = items.slice(0,4).map(thumb).join('') + (items.length > 4 ? `<span class="more">+${items.length - 4}</span>` : '');
+    return `<section class="group ${open ? 'open' : ''}" id="g-${a.id}" style="--c:${a.c}">
+      <button type="button" class="acc-h" data-acc="${a.id}" aria-expanded="${open}" aria-controls="gl-${a.id}">
+        <span class="ti" style="--c:${a.c}">${icon(a.id)}</span>
+        <div><h3>${a.n}</h3><small>${items.length} ${items.length === 1 ? 'ministério' : 'ministérios'} · ${a.h}<span class="hint-open"></span></small></div>
+        <span class="peek" aria-hidden="true">${peek}</span>
+        <span class="chev" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+      </button>
+      <div class="grid" id="gl-${a.id}">${open ? items.map(m => card(m)).join('') : ''}</div></section>`;
   }).join('');
 }
 
 function render(){ renderTiles(); renderActive(); renderResults();
+  $('#hero-eyebrow').textContent = `${ACT().length} ministérios · ${AREAS.length} áreas`;
   document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === st.view));
   document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === st.mode));
   $('#f-pub').value = st.pub; $('#btn-favs').setAttribute('aria-pressed', st.favs);
@@ -702,7 +968,7 @@ const toResults = () => { const y = $('#bar').getBoundingClientRect().top + wind
 /* ================= detail modal ================= */
 function openDetail(id, push=true){
   const m = BY[id]; if (!m) return;
-  const similar = M.filter(x => x !== m && x.g.some(g => m.g.includes(g)))
+  const similar = ACT().filter(x => x !== m && x.g.some(g => m.g.includes(g)))
     .map(x => [x, x.g.filter(g => m.g.includes(g)).length]).sort((a,b) => b[1]-a[1] || a[0].n.localeCompare(b[0].n,'pt')).slice(0,6).map(x => x[0]);
   const contacts = m.c.map(([who, tel]) => `<div class="contact">
       <div class="who"><b>${esc(who || m.r)}</b><span>${esc(tel)}</span></div>
@@ -722,7 +988,7 @@ function openDetail(id, push=true){
       <p class="desc">${esc(m.d)}</p>
       ${m.short ? `<div class="warn">A descrição no site atual é curta. Vale pedir ao responsável um texto contando o que o ministério faz e como entrar.</div>` : ''}
       ${m.gi ? `<a class="btn" href="../index.html">${icon('turma')}Ver GIs perto de mim no mapa</a>` : ''}
-      <div><span class="eyebrow">Responsável e contato</span><div class="box" style="margin-top:6px">${contacts}</div>
+      <div><span class="eyebrow">Responsável e contato</span><div class="box" style="margin-top:6px">${contacts || `<div class="contact"><div class="who"><b>${esc(m.r)}</b><span>Sem telefone cadastrado. Fale com a secretaria.</span></div></div>`}</div>
         ${bad ? `<div class="warn" style="margin-top:8px">Este número parece incompleto no site atual. Confirme com a secretaria antes de ligar.</div>` : ''}</div>
       ${m.l ? `<a class="btn btn-primary" href="${esc(m.l[1])}" target="_blank" rel="noopener">${esc(m.l[0])}</a>` : ''}
       ${similar.length ? `<div><span class="eyebrow">Também pode combinar com você</span><div class="similar" style="margin-top:8px">${similar.map(x => `<button type="button" data-open="${x.id}" style="--c:${x.c0}"><i></i>${esc(x.n)}</button>`).join('')}</div></div>` : ''}
@@ -745,7 +1011,7 @@ function closeDetail(){
 const QZ = {step:0, areas:new Set(), mode:'', pubs:new Set()};
 const LIFE = [['jovens','Sou jovem','18 a 35 anos'],['adolescentes','Sou adolescente','10 a 17 anos'],['casais','Sou casado(a) ou namoro',''],['mulheres','Sou mulher',''],['homens','Sou homem',''],['idosos','Tenho 60 anos ou mais',''],['solteiros','Sou solteiro(a)',''],['profissionais','Trabalho em uma área específica','Saúde, direito, TI, segurança, obras']];
 function quizScore(){
-  return M.map(m => {
+  return ACT().map(m => {
     const hits = m.g.filter(g => QZ.areas.has(g));
     let s = hits.length * 4 + (hits.length && m.g[0] === hits[0] ? 1 : 0);
     if (!hits.length) return null;
@@ -821,7 +1087,12 @@ $('#q-clear').addEventListener('click', () => { $('#q').value = ''; st.q = ''; r
 document.addEventListener('click', e => {
   const t = e.target.closest('button, a, [data-open]'); if (!t) return;
   const d = t.dataset;
-  if (d.area){ st.areas.has(d.area) ? st.areas.delete(d.area) : st.areas.add(d.area); render(); if (st.areas.has(d.area)) toResults(); }
+  if (d.acc){ toggleArea(d.acc); return; }
+  if (d.accall){ const ids = [...document.querySelectorAll('.group')].map(g => g.id.slice(2));
+    if (st.areas.size){ d.accall === 'open' ? closedSel.clear() : ids.forEach(i => closedSel.add(i)); }
+    else { d.accall === 'open' ? ids.forEach(i => openAreas.add(i)) : openAreas.clear(); saveOpen(); }
+    renderResults(); return; }
+  if (d.area){ closedSel.clear(); st.areas.has(d.area) ? st.areas.delete(d.area) : st.areas.add(d.area); render(); if (st.areas.has(d.area)) toResults(); }
   else if (d.areaOnly){ st.areas = new Set([d.areaOnly]); st.q = ''; $('#q').value = ''; st.favs = false; render(); }
   else if (d.try){ $('#q').value = d.try; st.q = d.try; render(); toResults(); }
   else if (d.mode !== undefined && t.closest('.bar')){ st.mode = d.mode; render(); }
@@ -853,11 +1124,276 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!$('#m-scrim').hidden) closeDetail(); else if (!$('#q-scrim').hidden) closeQuiz();
 });
-window.addEventListener('hashchange', () => { const id = location.hash.slice(1); if (BY[id]) openDetail(id, false); });
+/* ================= abas ================= */
+let TAB = 'explorar';
+function showTab(t, push=true){
+  TAB = t;
+  ['explorar','dashboard','admin'].forEach(v => { $('#view-' + v).hidden = v !== t; });
+  document.querySelectorAll('.ptab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  $('#btn-favs').hidden = t !== 'explorar';
+  if (t === 'dashboard') renderDash();
+  if (t === 'admin') renderAdmin();
+  if (t === 'explorar') render();
+  if (push) try { history.replaceState(null, '', t === 'explorar' ? location.pathname : '#' + t); } catch(e){}
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.ptab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+function renderAll(){ render(); if (TAB === 'dashboard') renderDash(); if (TAB === 'admin') renderAdmin(); }
 
-$('#hero-eyebrow').textContent = `${M.length} ministérios · ${AREAS.length} áreas`;
+/* ================= pendências ================= */
+function issues(m){
+  const out = [];
+  if (!m.c.length) out.push(['Sem contato', 'red']);
+  else if (m.c.some(([,t]) => !phoneOk(t))) out.push(['Telefone a conferir', 'red']);
+  if (m.short) out.push(['Descrição curta', '']);
+  if (!artSrc(m)) out.push(['Sem arte própria', '']);
+  return out;
+}
+function thumb(m){
+  const src = artSrc(m);
+  return src ? `<span class="thumb" style="background:${artBg(m)}"><img src="${src}" alt="" loading="lazy" onerror="this.remove()"></span>`
+             : `<span class="thumb gen" style="--c:${m.c0}">${esc(m.ini)}</span>`;
+}
+
+/* ================= dashboard ================= */
+function renderDash(){
+  const act = ACT(), off = DATA.filter(m => m.ativo === false);
+  const withIssue = act.filter(m => issues(m).length);
+  const phones = {};
+  act.forEach(m => m.c.forEach(([, t]) => { const d = digits(t); if (d.length >= 10){ (phones[d] = phones[d] || {tel:t, list:new Set(), who:new Set()}).list.add(m.n); phones[d].who.add(m.r); } }));
+  const top = Object.values(phones).filter(x => x.list.size > 1).sort((a,b) => b.list.size - a.list.size).slice(0,6);
+  const byArea = AREAS.map(a => ({a, n: act.filter(m => m.g.includes(a.id)).length})).sort((x,y) => y.n - x.n);
+  const maxA = Math.max(1, ...byArea.map(x => x.n));
+  const modes = [['s','Para servir','var(--accent)'],['p','Para participar','#6B5BB8'],['a','Servir e participar','#B8861B']].map(([k,l,c]) => ({k,l,c,n:act.filter(m => m.m === k).length}));
+  const pubs = PUBS.map(([k,l]) => ({k,l,n:act.filter(m => m.p.includes(k)).length})).filter(x => x.n);
+  const resp = new Set(act.map(m => m.r)).size;
+  const order = {red:0, '':1};
+  const iss = withIssue.map(m => ({m, list:issues(m)})).sort((a,b) => (order[a.list[0][1]] - order[b.list[0][1]]) || b.list.length - a.list.length || a.m.n.localeCompare(b.m.n,'pt'));
+
+  $('#dash').innerHTML = `
+    <div class="page-head"><div><h1>Visão geral dos ministérios</h1><p>Números calculados a partir do cadastro do Admin.</p></div>
+      <button class="btn" type="button" data-gotab="admin">Abrir o Admin</button></div>
+    <div class="kpi"><div class="eyebrow">Ministérios ativos</div><div class="v">${act.length}</div><div class="h">em ${AREAS.filter(a => act.some(m => m.g.includes(a.id))).length} áreas</div></div>
+    <div class="kpi"><div class="eyebrow">Desativados</div><div class="v">${off.length}</div><div class="h">não aparecem para os membros</div></div>
+    <div class="kpi"><div class="eyebrow">Responsáveis</div><div class="v">${resp}</div><div class="h">nomes diferentes cadastrados</div></div>
+    <div class="kpi ${withIssue.length ? 'warnk' : ''}"><div class="eyebrow">Com pendência</div><div class="v">${withIssue.length}</div><div class="h">telefone, descrição ou arte</div></div>
+
+    <section class="dcard c-7">
+      <h3>Ministérios por área</h3><p class="sub">Um ministério pode contar em mais de uma área. Toque para ver em Explorar.</p>
+      <div class="hbars">${byArea.map(({a,n}) => `<button type="button" class="hbar" data-goarea="${a.id}" style="--c:${a.c}" title="${a.n}: ${n} ${n === 1 ? 'ministério' : 'ministérios'}">
+        <span class="ti">${icon(a.id)}</span><span class="n">${a.n}</span><span class="track"><i style="width:${(n/maxA*100).toFixed(1)}%"></i></span><span class="val">${n}</span></button>`).join('')}</div>
+    </section>
+    <section class="dcard c-5">
+      <h3>Servir ou participar</h3><p class="sub">Tipo de cada ministério ativo.</p>
+      <div class="stack" role="img" aria-label="${modes.map(x => `${x.l}: ${x.n}`).join(', ')}">${modes.filter(x => x.n).map(x => `<span style="--c:${x.c};flex:${x.n}" title="${x.l}: ${x.n}"></span>`).join('')}</div>
+      <div class="leg">${modes.map(x => `<div style="--c:${x.c}"><i></i>${x.l}<b>${x.n}</b></div>`).join('')}</div>
+      <h3 style="margin-top:22px">Feitos para um público</h3><p class="sub">Os demais são abertos a todos.</p>
+      <div class="leg">${pubs.map(x => `<div style="--c:var(--ink-2)"><i></i>${x.l}<b>${x.n}</b></div>`).join('') || '<span class="sub">Nenhum.</span>'}</div>
+    </section>
+
+    <section class="dcard c-7">
+      <h3>Pendências para corrigir</h3><p class="sub">${iss.length ? 'Os de telefone primeiro, porque impedem o contato pelo WhatsApp.' : 'Nada pendente.'}</p>
+      <ul class="issues">${iss.map(({m,list}) => `<li>${thumb(m)}<div><div class="nm">${esc(m.n)}</div><div class="tags">${list.map(([t,c]) => `<span class="flag ${c}">${t}</span>`).join('')}</div></div>
+        <button class="btn btn-sm" type="button" data-edit="${m.id}">Corrigir</button></li>`).join('')}</ul>
+    </section>
+    <section class="dcard c-5">
+      <h3>Mesmo contato em vários ministérios</h3><p class="sub">Telefones que respondem por mais de um ministério. Vale ver se a pessoa não está sobrecarregada.</p>
+      <ul class="issues">${top.map(x => `<li><span class="thumb gen" style="--c:var(--accent)">${x.list.size}</span><div><div class="nm">${esc([...x.who][0])}</div><div class="muted" style="font-size:12.5px;color:var(--ink-2)">${esc(x.tel)} · ${esc([...x.list].join(', '))}</div></div><span></span></li>`).join('') || '<li class="sub">Nenhum contato repetido.</li>'}</ul>
+      ${off.length ? `<h3 style="margin-top:22px">Desativados</h3><p class="sub">Escondidos dos membros.</p>
+      <ul class="issues">${off.map(m => `<li>${thumb(m)}<div class="nm">${esc(m.n)}</div><button class="btn btn-sm" type="button" data-toggle="${m.id}">Reativar</button></li>`).join('')}</ul>` : ''}
+    </section>`;
+}
+
+/* ================= admin: lista ================= */
+AREAS.forEach(a => $('#a-area').insertAdjacentHTML('beforeend', `<option value="${a.id}">${a.n}</option>`));
+['#a-q','#a-status','#a-area'].forEach(s => $(s).addEventListener('input', renderAdmin));
+function renderAdmin(){
+  const q = norm($('#a-q').value.trim()), stt = $('#a-status').value, ar = $('#a-area').value;
+  const qd = q.replace(/\D/g,'');
+  const list = DATA.filter(m =>
+    (!q || m.hay.n.includes(q) || norm(m.r).includes(q) || (qd.length >= 3 && m.c.some(([,t]) => digits(t).includes(qd)))) &&
+    (!stt || (stt === 'on' && m.ativo !== false) || (stt === 'off' && m.ativo === false) || (stt === 'issue' && issues(m).length)) &&
+    (!ar || m.g.includes(ar))
+  ).sort((a,b) => a.n.localeCompare(b.n,'pt'));
+  $('#a-rows').innerHTML = list.map(m => {
+    const on = m.ativo !== false, tel = m.c[0] ? m.c[0][1] : '';
+    const bad = issues(m).find(x => x[1] === 'red');
+    return `<tr class="${on ? '' : 'off'}">
+      <td>${thumb(m)}</td>
+      <td><div class="nm">${esc(m.n)}</div><div class="mini">${m.g.map(g => `<span class="tag" style="--c:${AREA[g].c}">${AREA[g].n}</span>`).join('')}</div></td>
+      <td>${esc(m.r)}</td>
+      <td class="tel">${esc(tel) || '<span class="muted">—</span>'}${m.c.length > 1 ? ` <span class="muted">+${m.c.length - 1}</span>` : ''}${bad ? `<div><span class="flag red">${bad[0]}</span></div>` : ''}</td>
+      <td class="muted">${MODE_TXT[m.m]}</td>
+      <td><button type="button" class="sw-wrap" role="switch" aria-checked="${on}" data-toggle="${m.id}" aria-label="${on ? 'Desativar' : 'Ativar'} ${esc(m.n)}"><span class="switch"></span>${on ? 'Ativo' : 'Desativado'}</button></td>
+      <td style="text-align:right"><button class="btn btn-sm" type="button" data-edit="${m.id}">Editar</button></td></tr>`;
+  }).join('') || `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--ink-2)">Nenhum ministério com esses filtros.</td></tr>`;
+  const offN = DATA.filter(m => m.ativo === false).length;
+  $('#a-count').textContent = `Mostrando ${list.length} de ${DATA.length} ministérios · ${DATA.length - offN} ativos, ${offN} desativados.`;
+}
+function toggleActive(id){
+  const m = BY[id]; if (!m) return;
+  m.ativo = m.ativo === false; saveData(); renderAll();
+  toast(m.ativo ? `${m.n} reativado. Já aparece para os membros.` : `${m.n} desativado. Não aparece mais para os membros.`);
+}
+
+/* exportar / importar / restaurar */
+$('#a-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({versao:1, exportadoEm:new Date().toISOString(), ministerios:DATA.map(strip)}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `ministerios-imagine-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Arquivo exportado');
+});
+$('#a-import').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text()); const arr = Array.isArray(j) ? j : j.ministerios;
+    if (!Array.isArray(arr) || !arr.length || !arr.every(m => m && m.n && m.id)) throw new Error();
+    DATA = arr; reindex(); saveData(); renderAll(); toast(`${arr.length} ministérios importados`);
+  } catch(err){ toast('Esse arquivo não é uma exportação válida desta página.'); }
+});
+let resetArm = 0;
+$('#a-reset').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (Date.now() - resetArm > 4000){ resetArm = Date.now(); b.textContent = 'Clique de novo para confirmar'; b.classList.add('btn-danger'); setTimeout(() => { b.textContent = 'Restaurar original'; b.classList.remove('btn-danger'); }, 4000); return; }
+  resetArm = 0; b.textContent = 'Restaurar original'; b.classList.remove('btn-danger');
+  DATA = JSON.parse(JSON.stringify(SEED)); reindex(); saveData(); renderAll(); toast('Lista original do site restaurada');
+});
+
+/* ================= admin: editor ================= */
+let ED = null, edId = null, delArm = 0;
+const E = id => document.getElementById(id);
+function openEditor(id){
+  edId = id || null;
+  const src = id ? BY[id] : {n:'', d:'', g:[], m:'s', p:[], t:'', r:'', c:[['','']], ativo:true};
+  ED = JSON.parse(JSON.stringify(strip(src)));
+  if (!ED.c.length) ED.c = [['','']];
+  E('e-title').textContent = id ? `Editar ${src.n}` : 'Novo ministério';
+  E('e-n').value = ED.n; E('e-d').value = ED.d; E('e-r').value = ED.r; E('e-t').value = ED.t;
+  E('e-lt').value = ED.l ? ED.l[0] : ''; E('e-lu').value = ED.l ? ED.l[1] : '';
+  ['n','d','g','r','lu'].forEach(k => setE(k));
+  E('e-del-zone').hidden = !id; resetDel();
+  E('e-msg').textContent = id ? '' : 'Preencha nome, descrição, área e responsável.';
+  drawEditor(); E('e-scrim').hidden = false; document.body.style.overflow = 'hidden';
+  setTimeout(() => E('e-n').focus(), 30);
+}
+function closeEditor(){ E('e-scrim').hidden = true; ED = null; if ($('#m-scrim').hidden && $('#q-scrim').hidden) document.body.style.overflow = ''; }
+function setE(k, msg){ const e = E('er-' + k); if (!e) return; e.hidden = !msg; e.textContent = msg || ''; const f = E('e-' + k); if (f && f.tagName !== 'DIV') f.classList.toggle('bad', !!msg); }
+function drawEditor(){
+  E('e-g').innerHTML = AREAS.map(a => { const i = ED.g.indexOf(a.id); return `<button type="button" data-eg="${a.id}" style="--c:${a.c}" aria-pressed="${i >= 0}" ${i < 0 && ED.g.length >= 3 ? 'disabled' : ''}><span class="ti">${icon(a.id)}</span>${a.n}${i === 0 ? ' <small>principal</small>' : ''}</button>`; }).join('');
+  E('e-m').innerHTML = [['s','Para servir'],['p','Para participar'],['a','Os dois']].map(([k,l]) => `<button type="button" class="np" data-em="${k}" aria-pressed="${ED.m === k}">${l}</button>`).join('');
+  E('e-p').innerHTML = PUBS.map(([k,l]) => `<button type="button" class="np" data-ep="${k}" aria-pressed="${ED.p.includes(k)}">${l}</button>`).join('');
+  E('e-c').innerHTML = ED.c.map(([w,t], i) => `<div class="crow"><input class="c-name" data-ci="${i}" data-cf="0" value="${esc(w)}" placeholder="Nome (opcional)" aria-label="Nome do contato ${i+1}">
+    <input data-ci="${i}" data-cf="1" value="${esc(t)}" inputmode="tel" placeholder="(34) 99999-0000" aria-label="Telefone ${i+1}" class="${t && !phoneOk(t) ? 'bad' : ''}">
+    <button class="btn btn-ghost btn-icon" type="button" data-crm="${i}" aria-label="Remover contato ${i+1}" ${ED.c.length === 1 ? 'disabled' : ''}><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`).join('');
+  E('e-c-add').hidden = ED.c.length >= 4;
+  drawImg(); drawPreview(); counter();
+}
+function counter(){ const n = E('e-d').value.trim().length; E('e-d-c').textContent = `${n} caracteres${n < 40 ? ' · descrições com menos de 40 caracteres aparecem como pendência' : ''}`; }
+function previewObj(){
+  const o = JSON.parse(JSON.stringify(ED));
+  o.id = edId || '__novo__'; o.n = o.n || 'Nome do ministério'; o.d = o.d || 'A descrição aparece aqui.'; o.r = o.r || 'Responsável';
+  if (!o.g.length) o.g = ['bastidores'];
+  o.c = o.c.filter(c => c[1].trim()); prep(o); return o;
+}
+function drawImg(){
+  const o = previewObj();
+  E('e-img-prev').innerHTML = thumb(o);
+  E('e-img-orig').hidden = !(IMG[edId] && (ED.img || ED.noArt));
+  E('e-img-gen').hidden = !artSrc(o);
+}
+function drawPreview(){ E('e-prev').innerHTML = card(previewObj()); }
+function syncText(){
+  ED.n = E('e-n').value.trim(); ED.d = E('e-d').value.trim(); ED.r = E('e-r').value.trim(); ED.t = E('e-t').value.trim();
+  const lt = E('e-lt').value.trim(), lu = E('e-lu').value.trim();
+  if (lt || lu) ED.l = [lt || 'Saiba mais', lu]; else delete ED.l;
+}
+E('e-form').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.ci !== undefined){ ED.c[+t.dataset.ci][+t.dataset.cf] = t.value; if (t.dataset.cf === '1') t.classList.toggle('bad', !!t.value.trim() && !phoneOk(t.value)); }
+  else syncText();
+  if (t.id === 'e-d') counter();
+  drawPreview(); if (t.id === 'e-n') drawImg();
+});
+E('e-form').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const d = b.dataset;
+  if (d.eg){ const i = ED.g.indexOf(d.eg); i >= 0 ? ED.g.splice(i,1) : ED.g.length < 3 && ED.g.push(d.eg); setE('g'); drawEditor(); }
+  else if (d.em){ ED.m = d.em; drawEditor(); }
+  else if (d.ep){ const i = ED.p.indexOf(d.ep); i >= 0 ? ED.p.splice(i,1) : ED.p.push(d.ep); drawEditor(); }
+  else if (d.crm !== undefined){ ED.c.splice(+d.crm, 1); drawEditor(); }
+  else if (b.id === 'e-c-add'){ ED.c.push(['','']); drawEditor(); const ins = E('e-c').querySelectorAll('input'); ins[ins.length - 2].focus(); }
+  else if (b.id === 'e-img-gen'){ delete ED.img; delete ED.imgBg; ED.noArt = true; drawImg(); drawPreview(); }
+  else if (b.id === 'e-img-orig'){ delete ED.img; delete ED.imgBg; delete ED.noArt; drawImg(); drawPreview(); }
+  else if (b.id === 'e-ativo'){ ED.ativo = ED.ativo === false; drawAtivo(); }
+  else if (b.id === 'e-del'){
+    if (Date.now() - delArm > 4000){ delArm = Date.now(); b.textContent = 'Clique de novo para excluir'; b.classList.add('btn-danger'); setTimeout(resetDel, 4000); return; }
+    const n = BY[edId].n; DATA = DATA.filter(m => m.id !== edId); favs.delete(edId); saveFavs(); reindex(); saveData(); closeEditor(); renderAll(); toast(`${n} excluído`);
+  }
+  else if ('eClose' in d) closeEditor();
+});
+function resetDel(){ delArm = 0; const b = E('e-del'); b.textContent = 'Excluir ministério'; b.classList.remove('btn-danger'); }
+function drawAtivo(){ const on = ED.ativo !== false; E('e-ativo').setAttribute('aria-checked', on); E('e-ativo-t').textContent = on ? 'Ativo: aparece para os membros' : 'Desativado: escondido dos membros'; }
+const _draw = drawEditor; drawEditor = function(){ _draw(); drawAtivo(); };
+E('e-scrim').addEventListener('click', e => { if (e.target.id === 'e-scrim') closeEditor(); });
+E('e-img').addEventListener('change', e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  if (!/^image\//.test(f.type)){ toast('Escolha um arquivo de imagem (JPG ou PNG).'); return; }
+  const r = new FileReader();
+  r.onload = () => { const im = new Image(); im.onload = () => {
+    const w = Math.min(800, im.width), h = Math.round(im.height * w / im.width);
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const cx = cv.getContext('2d'); cx.drawImage(im, 0, 0, w, h);
+    const px = cx.getImageData(1, 1, 1, 1).data;
+    ED.img = cv.toDataURL('image/jpeg', 0.8); ED.imgBg = `rgb(${px[0]},${px[1]},${px[2]})`; delete ED.noArt;
+    drawImg(); drawPreview(); toast('Imagem pronta. Clique em Salvar para guardar.');
+  }; im.onerror = () => toast('Não consegui abrir essa imagem.'); im.src = r.result; };
+  r.readAsDataURL(f);
+});
+E('e-form').addEventListener('submit', e => {
+  e.preventDefault(); syncText();
+  let ok = true;
+  const dup = DATA.find(m => norm(m.n) === norm(ED.n) && m.id !== edId);
+  if (!ED.n){ setE('n', 'Informe o nome.'); ok = false; } else if (dup){ setE('n', `Já existe um ministério chamado ${dup.n}.`); ok = false; } else setE('n');
+  if (ED.d.length < 10){ setE('d', 'Escreva uma descrição de pelo menos uma frase.'); ok = false; } else setE('d');
+  if (!ED.g.length){ setE('g', 'Escolha pelo menos uma área.'); ok = false; } else setE('g');
+  if (!ED.r){ setE('r', 'Informe o responsável.'); ok = false; } else setE('r');
+  if (ED.l && ED.l[1] && !/^https?:\/\/\S+\.\S+/.test(ED.l[1])){ setE('lu', 'O link precisa começar com https://'); ok = false; } else setE('lu');
+  if (!ok){ E('e-msg').textContent = 'Confira os campos marcados.'; const bad = E('e-form').querySelector('.err:not([hidden])'); if (bad) bad.scrollIntoView({block:'center', behavior:'smooth'}); return; }
+  ED.c = ED.c.map(([w,t]) => [w.trim(), t.trim()]).filter(c => c[1]);
+  if (ED.l && !ED.l[1]) delete ED.l;
+  let m;
+  if (edId){ m = BY[edId]; Object.keys(m).forEach(k => { if (!DERIVED.includes(k) && k !== 'id') delete m[k]; }); Object.assign(m, ED, {id: edId}); }
+  else { let id = slug(ED.n) || 'ministerio', i = 2; while (BY[id]) id = `${slug(ED.n)}-${i++}`; m = {...ED, id}; DATA.push(m); }
+  reindex();
+  if (!saveData()) return;
+  const n = m.n; closeEditor(); renderAll();
+  const bad = issues(BY[m.id]).find(x => x[1] === 'red');
+  toast(`${n} salvo${m.ativo === false ? ' (desativado)' : ''}${bad ? ` · ${bad[0].toLowerCase()}` : ''}`);
+});
+
+/* cliques do dashboard / admin */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-edit],[data-toggle],[data-gotab],[data-goarea],#a-new'); if (!b) return;
+  if (b.id === 'a-new'){ openEditor(null); return; }
+  const d = b.dataset;
+  if (d.edit){ if (TAB !== 'admin') showTab('admin'); openEditor(d.edit); }
+  else if (d.toggle) toggleActive(d.toggle);
+  else if (d.gotab) showTab(d.gotab);
+  else if (d.goarea){ st.areas = new Set([d.goarea]); st.q = ''; $('#q').value = ''; st.favs = false; showTab('explorar'); setTimeout(toResults, 50); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !E('e-scrim').hidden){ e.stopImmediatePropagation(); closeEditor(); } }, true);
+
+/* ================= início ================= */
+function route(){
+  const h = location.hash.slice(1);
+  if (h === 'admin' || h === 'dashboard'){ showTab(h, false); return; }
+  if (TAB !== 'explorar') showTab('explorar', false);
+  if (BY[h] && BY[h].ativo !== false) openDetail(h, false);
+}
+window.addEventListener('hashchange', route);
 render();
-const h0 = location.hash.slice(1); if (BY[h0]) openDetail(h0, false);
+route();
+
 })();
 </script>
 </body>
