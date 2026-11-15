@@ -1,0 +1,1400 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ministérios Imagine</title>
+<meta name="description" content="Protótipo: encontre um ministério da Imagine Uberlândia pelo que você gosta de fazer.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0E6B5C">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230E6B5C'/%3E%3Ctext x='32' y='42' font-family='Arial' font-weight='800' font-size='26' fill='white' text-anchor='middle'%3EIM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..700&display=swap">
+<style>
+/* Layout: cabeçalho → busca + quiz → grade de interesses → barra de filtros fixa → resultados (por interesse ou A–Z) */
+:root{
+  --bg:#F2F4F3; --surface:#FFFFFF; --surface-2:#E9EEEC; --ink:#16201D; --ink-2:#51605B; --line:#D5DDD9;
+  --accent:#0E6B5C; --accent-ink:#FFFFFF; --accent-soft:#DCEEE9; --hl:#FFE8A3;
+  --danger:#B42318; --warn-soft:#FFF4D6;
+  --shadow:0 1px 2px rgb(20 30 28/.06),0 6px 20px rgb(20 30 28/.08);
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1413; --surface:#162020; --surface-2:#1E2A28; --ink:#E5ECE9; --ink-2:#9AAAA5; --line:#2A3835;
+  --accent:#43B79F; --accent-ink:#062019; --accent-soft:#16352F; --hl:#5A4A12;
+  --danger:#F2846C; --warn-soft:#3A3220;
+  --shadow:0 1px 2px rgb(0 0 0/.3),0 8px 24px rgb(0 0 0/.35);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1413; --surface:#162020; --surface-2:#1E2A28; --ink:#E5ECE9; --ink-2:#9AAAA5; --line:#2A3835;
+  --accent:#43B79F; --accent-ink:#062019; --accent-soft:#16352F; --hl:#5A4A12;
+  --danger:#F2846C; --warn-soft:#3A3220;
+  --shadow:0 1px 2px rgb(0 0 0/.3),0 8px 24px rgb(0 0 0/.35);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:150px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 1px}
+
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:10px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{background:var(--accent);filter:brightness(1.08)}
+.btn-ghost{border-color:transparent;background:none;color:var(--ink-2)}
+.btn-sm{padding:6px 10px;font-size:13px}
+.btn-icon{padding:7px;line-height:0}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* header */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:14px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
+.brand-mark{width:38px;height:38px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:800 15px var(--f-display);flex:none}
+.brand b{display:block;font:700 18px/1.1 var(--f-display)}
+.brand span{font-size:12.5px;color:var(--ink-2)}
+.fav-count{background:var(--accent);color:var(--accent-ink);border-radius:999px;font-size:11.5px;padding:0 7px;min-width:20px;text-align:center}
+
+/* hero */
+.hero{padding-block:22px 10px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:end}
+.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.02;font-weight:800}
+.hero p{margin:10px 0 0;color:var(--ink-2);font-size:16px;max-width:52ch}
+.quiz-cta{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px;display:flex;gap:14px;align-items:center}
+.quiz-cta .ic{width:46px;height:46px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.quiz-cta .ic svg{width:24px;height:24px}
+.quiz-cta div{flex:1;min-width:0}
+.quiz-cta b{display:block;font:700 16px var(--f-display)}
+.quiz-cta small{color:var(--ink-2);font-size:13px}
+.search-big{position:relative;margin-top:18px}
+.search-big input{width:100%;padding:15px 44px 15px 48px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-size:16px;box-shadow:var(--shadow)}
+.search-big input:focus{border-color:var(--accent);outline:none}
+.search-big .s-ic{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--ink-2)}
+.search-big .clear{position:absolute;right:8px;top:50%;transform:translateY(-50%)}
+.try{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:13px;color:var(--ink-2);align-items:center}
+.try button{border:0;background:var(--surface-2);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;color:var(--ink)}
+.try button:hover{background:var(--accent-soft)}
+
+/* interest grid */
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 0 12px;flex-wrap:wrap}
+.sec-head h2{font-size:21px}
+.sec-head p{margin:0;color:var(--ink-2);font-size:13.5px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:10px}
+.tile{--c:#888;position:relative;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:16px;padding:13px 30px 12px 14px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;min-width:0;transition:border-color .15s,transform .15s}
+.tile:hover{border-color:var(--c);transform:translateY(-1px)}
+.tile .ti{grid-row:span 2;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 15%,var(--surface));color:var(--c)}
+.tile .ti svg{width:22px;height:22px}
+.tile b{font:700 15px/1.2 var(--f-display);min-width:0}
+.tile small{color:var(--ink-2);font-size:12.5px;line-height:1.3;min-width:0}
+.tile .n{position:absolute;top:9px;right:11px;font-size:12px;font-weight:700;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.tile[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 9%,var(--surface));box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 30%,transparent)}
+.tile[aria-pressed="true"] .ti{background:var(--c);color:#fff}
+.tile.zero{opacity:.45}
+
+/* filter bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-top:24px}
+.bar-in{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-block:10px}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:11px;padding:3px;gap:2px}
+.seg button{border:0;background:none;padding:6px 11px;border-radius:8px;font-weight:600;font-size:13px;color:var(--ink-2);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.bar select{padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:13.5px;font-weight:600}
+.bar .count{margin-left:auto;font-size:13.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.bar .count b{color:var(--ink)}
+.active{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:10px}
+.pill{--c:var(--accent);display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 6px 4px 11px;font-size:13px;font-weight:600;background:color-mix(in srgb,var(--c) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 40%,transparent)}
+.pill button{border:0;background:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2);padding:0;font-size:14px;line-height:1}
+.pill button:hover{background:var(--surface-2);color:var(--ink)}
+
+/* results */
+.results{padding-block:18px 40px}
+.acc-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.acc-tools p{margin:0;color:var(--ink-2);font-size:13.5px}
+.acc-tools div{display:flex;gap:6px}
+.group{margin-bottom:10px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden;scroll-margin-top:150px}
+.group.open{border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
+.acc-h{width:100%;border:0;background:none;padding:12px 14px;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;color:var(--ink)}
+.acc-h:hover{background:color-mix(in srgb,var(--c) 6%,var(--surface))}
+.acc-h>div{flex:1;min-width:0}
+.peek{display:flex;flex:none}
+.peek .thumb{width:40px;height:28px;border-radius:7px;border:2px solid var(--surface);margin-left:-10px;font-size:10px}
+.peek .thumb:first-child{margin-left:0}
+.peek .more{width:28px;height:28px;border-radius:50%;margin-left:-8px;background:var(--surface-2);border:2px solid var(--surface);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--ink-2)}
+.chev{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);flex:none;transition:transform .2s}
+.group.open .chev{transform:rotate(180deg);background:color-mix(in srgb,var(--c) 15%,var(--surface))}
+.group .grid{padding:4px 14px 16px}
+.group:not(.open) .grid{display:none}
+.group:not(.open) .acc-h small .hint-open::after{content:" · toque para ver"}
+.group-h{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.acc-h .ti,.group-h .ti{--c:#888;width:36px;height:36px;border-radius:11px;background:var(--c);color:#fff;display:grid;place-items:center;flex:none}
+.acc-h .ti svg,.group-h .ti svg{width:19px;height:19px}
+.acc-h h3,.group-h h3{font-size:18px}
+.acc-h small,.group-h small{color:var(--ink-2);font-size:13px;display:block}
+@media (max-width:560px){.peek{display:none}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.card{--c:#888;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px 16px 14px;display:flex;flex-direction:column;gap:9px;min-width:0;position:relative;overflow:hidden}
+.cover{--bg:#000;margin:-15px -16px 2px;height:160px;background:var(--bg);display:grid;place-items:center;overflow:hidden;cursor:pointer;border:0;padding:0;width:calc(100% + 32px);position:relative}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;max-width:100%}
+.card .mono{display:none}
+.cover.gen{background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#000));color:#fff;text-align:left;place-items:end start;padding:16px 18px}
+.cover.gen b{font:800 24px/1.05 var(--f-display);letter-spacing:-.01em;max-width:85%;text-wrap:balance}
+.cover.gen .gm{position:absolute;top:12px;left:18px;font:800 20px var(--f-display);opacity:.55}
+.cover.gen svg{position:absolute;right:-14px;bottom:-18px;width:120px;height:120px;opacity:.16;stroke-width:1.4}
+.card .star{top:8px;right:8px;background:color-mix(in srgb,var(--surface) 88%,transparent);z-index:1}
+.card .star:hover{background:var(--surface)}
+.card-t{padding-right:0}
+.m-cover{margin:0 20px;border-radius:16px;overflow:hidden;aspect-ratio:16/9;max-width:100%}
+.m-cover.cover{width:auto;height:auto;margin:0 20px;cursor:default}
+.card:hover{border-color:color-mix(in srgb,var(--c) 55%,var(--line))}
+.card-top{display:flex;gap:12px;align-items:flex-start}
+.mono{width:40px;height:40px;border-radius:12px;background:var(--c);color:#fff;display:grid;place-items:center;font:800 14px var(--f-display);flex:none;letter-spacing:.02em}
+.card-t{flex:1;min-width:0}
+.card-t h4{margin:0;font:700 16.5px/1.2 var(--f-display)}
+.card-t .who{font-size:12.5px;color:var(--ink-2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.star{position:absolute;top:10px;right:10px;border:0;background:none;padding:6px;border-radius:9px;color:var(--ink-2);line-height:0}
+.star:hover{background:var(--surface-2)}
+.star[aria-pressed="true"]{color:#E2A400}
+.star[aria-pressed="true"] svg{fill:currentColor}
+.card p{margin:0;font-size:14px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{--c:#888;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--c) 13%,var(--surface));color:var(--ink);border:1px solid color-mix(in srgb,var(--c) 30%,transparent);white-space:nowrap}
+.tag.mode{--c:var(--ink-2);background:var(--surface-2);border-color:transparent;color:var(--ink-2)}
+.why{font-size:12.5px;color:var(--accent);font-weight:700}
+.card-a{display:flex;gap:8px;margin-top:auto;padding-top:2px}
+.card-a .btn{flex:1}
+.btn-wa{background:#1F9D55;border-color:#1F9D55;color:#fff}
+.btn-wa:hover{background:#1F9D55;filter:brightness(1.07)}
+.letter{font:800 26px var(--f-display);color:var(--ink-2);margin:20px 0 10px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.az{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.az a{width:30px;height:30px;display:grid;place-items:center;border-radius:8px;background:var(--surface);border:1px solid var(--line);text-decoration:none;font-weight:700;font-size:13px}
+.az a:hover{border-color:var(--accent)}
+.empty{text-align:center;padding:40px 16px;background:var(--surface);border:1px dashed var(--line);border-radius:18px;color:var(--ink-2)}
+.empty b{display:block;color:var(--ink);font:700 18px var(--f-display);margin-bottom:6px}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgb(10 16 15/.55);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}
+.modal{width:min(620px,100%);max-height:100%;overflow:auto;background:var(--bg);border-radius:22px;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column}
+.m-head{--c:#888;padding:20px 20px 16px;background:linear-gradient(0deg,var(--bg),color-mix(in srgb,var(--c) 14%,var(--bg)));display:flex;gap:14px;align-items:flex-start;position:sticky;top:0;z-index:2}
+.m-head .mono{width:52px;height:52px;font-size:17px;border-radius:15px}
+.m-head h2{font-size:24px;line-height:1.1}
+.m-head .tags{margin-top:8px}
+.m-head>div{flex:1;min-width:0}
+.m-body{padding:4px 20px 20px;display:flex;flex-direction:column;gap:18px}
+.m-body p.desc{margin:0;font-size:15.5px;white-space:pre-line}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.contact{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:8px}
+.contact+.contact{border-top:1px solid var(--line)}
+.contact .who{flex:1 1 160px;min-width:0}
+.contact .who b{display:block}
+.contact .who span{font-size:14px;color:var(--ink-2);font-variant-numeric:tabular-nums;user-select:all}
+.warn{background:var(--warn-soft);border-radius:10px;padding:8px 11px;font-size:13px}
+.similar{display:flex;flex-wrap:wrap;gap:6px}
+.similar button{--c:#888;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px 5px 6px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px}
+.similar button i{width:20px;height:20px;border-radius:7px;background:var(--c);display:block}
+.similar button:hover{border-color:var(--c)}
+.m-foot{display:flex;gap:8px;flex-wrap:wrap}
+
+/* quiz */
+.quiz{width:min(680px,100%);overflow:hidden}
+.quiz .q-body{flex:1;min-height:0;overflow:auto}
+.quiz .q-foot{border-top:1px solid var(--line);background:var(--bg)}
+.q-head{padding:18px 20px 8px;display:flex;align-items:center;gap:12px}
+.q-head h2{font-size:21px;flex:1}
+.q-prog{display:flex;gap:5px;padding:0 20px}
+.q-prog i{flex:1;height:5px;border-radius:5px;background:var(--surface-2)}
+.q-prog i.on{background:var(--accent)}
+.q-body{padding:16px 20px 8px}
+.q-body h3{font-size:19px;margin-bottom:4px}
+.q-body .hint{color:var(--ink-2);font-size:13.5px;margin:0 0 14px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.opt{--c:var(--accent);border:1.5px solid var(--line);background:var(--surface);border-radius:13px;padding:11px 12px;text-align:left;display:flex;gap:10px;align-items:center;font-weight:600;font-size:14px;line-height:1.25}
+.opt .ti{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 15%,var(--surface));color:var(--c);flex:none}
+.opt .ti svg{width:18px;height:18px}
+.opt small{display:block;font-weight:500;color:var(--ink-2);font-size:12px}
+.opt[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.opt[aria-pressed="true"] .ti{background:var(--c);color:#fff}
+.opt:disabled{opacity:.45;cursor:not-allowed}
+.q-foot{display:flex;justify-content:space-between;gap:8px;padding:14px 20px 20px;align-items:center}
+.q-foot .left{color:var(--ink-2);font-size:13px}
+.q-res{display:flex;flex-direction:column;gap:10px}
+.q-res .card{padding:13px 14px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:4000;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
+.foot{color:var(--ink-2);font-size:12.5px;padding-block:20px 30px;border-top:1px solid var(--line)}
+
+/* abas principais */
+.ptabs{display:flex;background:var(--surface-2);border-radius:12px;padding:4px;gap:2px}
+.ptab{border:0;background:none;padding:7px 13px;border-radius:9px;font-weight:600;font-size:14px;color:var(--ink-2);display:inline-flex;gap:6px;align-items:center}
+.ptab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.note{background:var(--warn-soft);border-radius:12px;padding:10px 14px;font-size:13.5px;display:flex;gap:10px;align-items:flex-start}
+.note svg{margin-top:2px}
+
+/* dashboard */
+.dash{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;padding-block:8px 40px}
+.page-head{grid-column:1/-1;display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;padding-top:14px}
+.page-head h1{font-size:clamp(24px,3.5vw,32px)}
+.page-head p{margin:4px 0 0;color:var(--ink-2)}
+.kpi{grid-column:span 3;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.kpi .v{font:800 34px/1.1 var(--f-display);font-variant-numeric:tabular-nums;margin-top:6px}
+.kpi .h{font-size:13px;color:var(--ink-2)}
+.kpi.warnk .v{color:var(--danger)}
+.dcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.dcard h3{font-size:17px}
+.dcard .sub{font-size:13px;color:var(--ink-2);margin:2px 0 14px}
+.c-7{grid-column:span 7}.c-5{grid-column:span 5}.c-6{grid-column:span 6}.c-12{grid-column:1/-1}
+.hbars{display:flex;flex-direction:column;gap:7px}
+.hbar{display:grid;grid-template-columns:24px minmax(0,190px) minmax(0,1fr) 30px;gap:10px;align-items:center;font-size:13.5px;border:0;background:none;padding:2px 0;text-align:left;border-radius:6px}
+.hbar:hover .track i{filter:brightness(1.1)}
+.hbar .ti{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 15%,var(--surface));color:var(--c)}
+.hbar .ti svg{width:14px;height:14px}
+.hbar .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{height:12px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.track i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--accent)}
+.hbar .val{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.stack{display:flex;height:16px;border-radius:999px;overflow:hidden;gap:2px;margin:6px 0 12px}
+.stack span{background:var(--c)}
+.leg{display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.leg div{display:flex;align-items:center;gap:8px}
+.leg i{width:11px;height:11px;border-radius:3px;background:var(--c);flex:none}
+.leg b{margin-left:auto;font-variant-numeric:tabular-nums}
+.issues{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.issues li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.issues li:first-child{border-top:0;padding-top:0}
+.issues .nm{font-weight:700}
+.issues .tags{margin-top:3px}
+.flag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--warn-soft);color:var(--ink)}
+.flag.red{background:var(--danger-soft,#FBE4E1);color:var(--danger)}
+.thumb{width:56px;height:38px;border-radius:8px;overflow:hidden;background:var(--bg);display:grid;place-items:center;flex:none;position:relative}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.thumb.gen{background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#000));color:#fff;font:800 12px var(--f-display)}
+
+/* admin */
+.admin{padding-block:8px 40px;display:flex;flex-direction:column;gap:14px}
+.admin-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.admin-tools input,.admin-tools select{padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:14px;min-width:0}
+.admin-tools input{flex:1 1 220px}
+.admin-tools .sp{flex:1}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.atable{width:100%;border-collapse:collapse;font-size:14px;min-width:880px}
+.atable th{text-align:left;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.atable td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.atable tr:last-child td{border-bottom:0}
+.atable tr.off td{opacity:.55}
+.atable tr.off td:last-child,.atable tr.off td:nth-last-child(2){opacity:1}
+.atable .nm{font-weight:700}
+.atable .mini{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.atable .mini .tag{font-size:10.5px;padding:1px 7px}
+.atable .muted{color:var(--ink-2);font-size:13px}
+.atable .tel{font-variant-numeric:tabular-nums;white-space:nowrap}
+.sw-wrap{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;border:0;background:none;padding:4px;border-radius:999px;color:var(--ink-2)}
+.switch{width:38px;height:22px;border-radius:999px;background:var(--line);position:relative;transition:background .15s;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgb(0 0 0/.25);transition:transform .15s}
+[aria-checked="true"] .switch{background:var(--accent)}
+[aria-checked="true"] .switch::after{transform:translateX(16px)}
+[aria-checked="true"]{color:var(--ink)}
+
+/* drawer */
+.drawer-scrim{justify-content:flex-end;align-items:stretch;padding:0}
+.drawer{width:min(1000px,100%);height:100%;background:var(--bg);border-left:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) 330px;grid-template-rows:auto minmax(0,1fr) auto;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.dr-head{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.dr-head h2{font-size:20px;flex:1;min-width:0}
+.dr-body{overflow:auto;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start}
+.dr-prev{overflow:auto;padding:18px;border-left:1px solid var(--line);background:var(--surface-2)}
+.dr-prev .card{pointer-events:none}
+.dr-foot{grid-column:1/-1;display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--line);background:var(--surface);align-items:center;flex-wrap:wrap}
+.dr-foot .sp{flex:1}
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld.full{grid-column:1/-1}
+.fld>label,.fld .lab{font-size:13px;font-weight:700}
+.fld input,.fld textarea,.fld select{padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:14.5px;min-width:0;width:100%}
+.fld textarea{min-height:120px;resize:vertical;line-height:1.5}
+.fld .hint{font-size:12px;color:var(--ink-2)}
+.fld .err{font-size:12.5px;color:var(--danger);font-weight:600}
+.fld .bad{border-color:var(--danger)}
+.pick{display:flex;flex-wrap:wrap;gap:6px}
+.pick button{--c:var(--accent);border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px 5px 7px;font-size:13px;font-weight:600;display:inline-flex;gap:6px;align-items:center;color:var(--ink)}
+.pick button.np{padding-left:11px}
+.pick button .ti{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 15%,var(--surface));color:var(--c)}
+.pick button .ti svg{width:13px;height:13px}
+.pick button[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,var(--surface))}
+.pick button[aria-pressed="true"] .ti{background:var(--c);color:#fff}
+.pick button small{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--c)}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center}
+.crow+.crow{margin-top:8px}
+.img-box{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.img-box .thumb{width:120px;height:80px;border-radius:12px}
+.img-box .acts{display:flex;gap:6px;flex-wrap:wrap}
+.danger-zone{border:1px dashed color-mix(in srgb,var(--danger) 50%,transparent);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn-danger:hover{background:var(--danger);filter:brightness(1.08)}
+@media (max-width:860px){
+  .drawer{grid-template-columns:minmax(0,1fr)}
+  .dr-prev{display:none}
+}
+@media (max-width:1000px){.kpi{grid-column:span 6}.c-7,.c-5,.c-6{grid-column:1/-1}}
+@media (max-width:560px){
+  .dr-body{grid-template-columns:minmax(0,1fr)}
+  .crow{grid-template-columns:minmax(0,1fr) auto}
+  .crow .c-name{grid-column:1/-1}
+  .hbar{grid-template-columns:24px minmax(0,1fr) 70px 26px}
+  .ptabs{width:100%}.ptab{flex:1;justify-content:center}
+}
+
+@media (max-width:820px){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .bar .count{margin-left:0;flex-basis:100%}
+}
+@media (max-width:520px){
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tile{grid-template-columns:minmax(0,1fr);padding:12px}
+  .tile .ti{grid-row:auto;width:36px;height:36px}
+  .tile small{display:none}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .opts{grid-template-columns:minmax(0,1fr)}
+  .top .hide-sm{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="wrap top">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">IM</div>
+    <div><b>Ministérios</b><span>Imagine Uberlândia · protótipo</span></div>
+  </div>
+  <nav class="ptabs" role="tablist" aria-label="Seções">
+    <button class="ptab" role="tab" data-tab="explorar" aria-selected="true">Explorar</button>
+    <button class="ptab" role="tab" data-tab="dashboard" aria-selected="false">Dashboard</button>
+    <button class="ptab" role="tab" data-tab="admin" aria-selected="false">Admin</button>
+  </nav>
+  <a class="btn btn-ghost btn-sm hide-sm" href="../index.html">
+    <svg class="i" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0119 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Mapa dos GIs</a>
+  <button class="btn btn-sm" type="button" id="btn-favs" aria-pressed="false">
+    <svg class="i" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>
+    Salvos <span class="fav-count" id="fav-count">0</span>
+  </button>
+</header>
+
+<main>
+<div id="view-explorar">
+  <section class="wrap hero">
+    <div>
+      <span class="eyebrow" id="hero-eyebrow">77 ministérios · 15 áreas</span>
+      <h1>Encontre o seu lugar para servir</h1>
+      <p>Comece pelo que você já gosta de fazer no dia a dia. A gente mostra os ministérios que combinam com você.</p>
+      <div class="search-big">
+        <svg class="i s-ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Ex.: violão, fotografia, crianças, advogado, bike…" autocomplete="off" aria-label="Buscar ministério">
+        <button class="btn btn-ghost btn-icon clear" type="button" id="q-clear" aria-label="Limpar busca" hidden><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="try"><span>Tente:</span>
+        <button type="button" data-try="cantar">cantar</button><button type="button" data-try="câmera">câmera</button><button type="button" data-try="crianças">crianças</button><button type="button" data-try="programação">programação</button><button type="button" data-try="moto">moto</button><button type="button" data-try="inglês">inglês</button>
+      </div>
+    </div>
+    <div class="quiz-cta">
+      <span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></span>
+      <div><b>Não sabe por onde começar?</b><small>3 perguntas rápidas e a gente sugere ministérios para você.</small></div>
+      <button class="btn btn-primary" type="button" id="btn-quiz">Descobrir</button>
+    </div>
+  </section>
+
+  <section class="wrap" aria-labelledby="h-areas">
+    <div class="sec-head">
+      <h2 id="h-areas">O que você gosta de fazer?</h2>
+      <p>Toque em uma ou mais áreas. Um ministério pode aparecer em várias.</p>
+    </div>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <div class="bar" id="bar">
+    <div class="wrap">
+      <div class="bar-in">
+        <div class="seg" role="group" aria-label="O que você procura">
+          <button type="button" data-mode="" aria-pressed="true">Tudo</button>
+          <button type="button" data-mode="s" aria-pressed="false">Quero servir</button>
+          <button type="button" data-mode="p" aria-pressed="false">Quero participar</button>
+        </div>
+        <select id="f-pub" aria-label="Feito para">
+          <option value="">Para todos os públicos</option>
+        </select>
+        <div class="seg" role="group" aria-label="Organizar">
+          <button type="button" data-view="grupos" aria-pressed="true">Por área</button>
+          <button type="button" data-view="az" aria-pressed="false">A–Z</button>
+        </div>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="active" id="active" hidden></div>
+    </div>
+  </div>
+
+  <section class="wrap results" id="results" aria-live="polite"></section>
+
+  <footer class="wrap foot">
+    Protótipo com os ministérios do site atual da Imagine Uberlândia. Contatos copiados da página "Nossos Ministérios". Favoritos e alterações do Admin ficam salvos só neste navegador.
+  </footer>
+</div>
+
+<section class="wrap" id="view-dashboard" hidden>
+  <div class="dash" id="dash"></div>
+</section>
+
+<section class="wrap" id="view-admin" hidden>
+  <div class="admin">
+    <div class="page-head" style="padding-top:14px">
+      <div><h1>Administrar ministérios</h1><p>Crie, edite, desative ou reative ministérios. As mudanças aparecem na hora em Explorar.</p></div>
+      <button class="btn btn-primary" type="button" id="a-new"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Novo ministério</button>
+    </div>
+    <div class="note"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg>
+      <span>Protótipo: as alterações ficam salvas só neste navegador. Use <b>Exportar</b> para guardar um arquivo com os dados. No sistema real, o Admin terá login e as mudanças valem para todos.</span></div>
+    <div class="admin-tools">
+      <input id="a-q" type="search" placeholder="Buscar por nome, responsável ou telefone" aria-label="Buscar no admin">
+      <select id="a-status" aria-label="Status"><option value="">Todos os status</option><option value="on">Ativos</option><option value="off">Desativados</option><option value="issue">Com pendência</option></select>
+      <select id="a-area" aria-label="Área"><option value="">Todas as áreas</option></select>
+      <span class="sp"></span>
+      <button class="btn btn-sm" type="button" id="a-export"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Exportar</button>
+      <label class="btn btn-sm" for="a-import" style="cursor:pointer"><svg class="i" viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>Importar</label>
+      <input type="file" id="a-import" accept="application/json,.json" hidden>
+      <button class="btn btn-sm btn-ghost" type="button" id="a-reset">Restaurar original</button>
+    </div>
+    <div class="table-wrap">
+      <table class="atable">
+        <thead><tr><th>Arte</th><th>Ministério</th><th>Responsável</th><th>Contato</th><th>Tipo</th><th>Status</th><th></th></tr></thead>
+        <tbody id="a-rows"></tbody>
+      </table>
+    </div>
+    <p class="muted" id="a-count" style="margin:0;font-size:13px;color:var(--ink-2)"></p>
+  </div>
+</section>
+</main>
+
+<!-- editor do admin -->
+<div class="scrim drawer-scrim" id="e-scrim" style="z-index:3200" hidden>
+  <form class="drawer" id="e-form" novalidate role="dialog" aria-modal="true" aria-labelledby="e-title">
+    <div class="dr-head">
+      <h2 id="e-title">Editar ministério</h2>
+      <button class="btn btn-ghost btn-icon" type="button" data-e-close aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dr-body">
+      <div class="fld"><label for="e-n">Nome do ministério</label><input id="e-n" placeholder="Ex.: Worship" maxlength="60"><span class="err" id="er-n" hidden></span></div>
+      <div class="fld"><span class="lab">Status</span>
+        <button type="button" class="sw-wrap" id="e-ativo" role="switch" aria-checked="true"><span class="switch"></span><span id="e-ativo-t">Ativo: aparece para os membros</span></button></div>
+      <div class="fld full"><label for="e-d">Descrição</label><textarea id="e-d" placeholder="O que o ministério faz, quando se reúne e como entrar."></textarea>
+        <span class="hint" id="e-d-c"></span><span class="err" id="er-d" hidden></span></div>
+      <div class="fld full"><span class="lab">Áreas de interesse</span><span class="hint">A primeira escolhida é a principal (define a cor). Escolha até 3.</span><div class="pick" id="e-g"></div><span class="err" id="er-g" hidden></span></div>
+      <div class="fld"><span class="lab">Tipo</span><div class="pick" id="e-m"></div></div>
+      <div class="fld"><span class="lab">Feito para</span><span class="hint">Deixe vazio se for para todos.</span><div class="pick" id="e-p"></div></div>
+      <div class="fld full"><label for="e-r">Responsável</label><input id="e-r" placeholder="Ex.: Pra. Kelle"><span class="err" id="er-r" hidden></span></div>
+      <div class="fld full"><span class="lab">Contatos (WhatsApp)</span><div id="e-c"></div>
+        <button class="btn btn-sm btn-ghost" type="button" id="e-c-add" style="align-self:flex-start">+ Adicionar contato</button>
+        <span class="hint">Use DDD + 9 dígitos. Ex.: (34) 99999-0000.</span></div>
+      <div class="fld"><label for="e-lt">Botão extra (texto)</label><input id="e-lt" placeholder="Ex.: Entrar no grupo do WhatsApp"></div>
+      <div class="fld"><label for="e-lu">Botão extra (link)</label><input id="e-lu" inputmode="url" placeholder="https://..."><span class="err" id="er-lu" hidden></span></div>
+      <div class="fld full"><label for="e-t">Palavras para a busca</label><input id="e-t" placeholder="Ex.: violão bateria cantar"><span class="hint">Palavras que as pessoas digitariam para achar este ministério.</span></div>
+      <div class="fld full"><span class="lab">Arte do ministério</span>
+        <div class="img-box"><div id="e-img-prev"></div>
+          <div class="acts">
+            <label class="btn btn-sm" for="e-img" style="cursor:pointer">Enviar imagem</label>
+            <input type="file" id="e-img" accept="image/*" hidden>
+            <button class="btn btn-sm btn-ghost" type="button" id="e-img-gen">Usar capa colorida</button>
+            <button class="btn btn-sm btn-ghost" type="button" id="e-img-orig" hidden>Voltar à arte original</button>
+          </div></div>
+        <span class="hint">A imagem é reduzida automaticamente para carregar rápido.</span></div>
+      <div class="fld full" id="e-del-zone"><div class="danger-zone"><span style="flex:1">Excluir apaga o ministério de vez. Para só esconder dos membros, desative.</span>
+        <button class="btn btn-sm" type="button" id="e-del">Excluir ministério</button></div></div>
+    </div>
+    <aside class="dr-prev" aria-label="Pré-visualização"><span class="eyebrow">Como os membros vão ver</span><div id="e-prev" style="margin-top:10px"></div></aside>
+    <div class="dr-foot"><span class="hint" id="e-msg" style="font-size:13px;color:var(--ink-2)"></span><span class="sp"></span>
+      <button class="btn" type="button" data-e-close>Cancelar</button><button class="btn btn-primary" type="submit">Salvar</button></div>
+  </form>
+</div>
+
+<!-- detalhe -->
+<div class="scrim" id="m-scrim" style="z-index:3100" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title" id="m-modal"></div>
+</div>
+
+<!-- quiz -->
+<div class="scrim" id="q-scrim" hidden>
+  <div class="modal quiz" role="dialog" aria-modal="true" aria-labelledby="q-title">
+    <div class="q-head"><h2 id="q-title">Descubra seu ministério</h2><button class="btn btn-ghost btn-icon" type="button" data-close-quiz aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="q-prog" id="q-prog"><i></i><i></i><i></i><i></i></div>
+    <div class="q-body" id="q-body"></div>
+    <div class="q-foot"><button class="btn" type="button" id="q-back">Voltar</button><span class="left" id="q-left"></span><button class="btn btn-primary" type="button" id="q-next">Continuar</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+/* ================= ÁREAS (grupos por interesse) ================= */
+const I = {
+  musica:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  artes:'<path d="M12 3a9 9 0 100 18c1.1 0 1.6-.9 1.6-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.7-1.7 1.7-1.7H16a5 5 0 005-5c0-4-4-7.2-9-7.2z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15" cy="8" r="1"/>',
+  midia:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  tecnologia:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M10 8l-2 2 2 2M14 8l2 2-2 2"/>',
+  negocios:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18"/>',
+  acolher:'<path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/>',
+  social:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/>',
+  criancas:'<circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 007 0"/><path d="M9 9.5v.5M15 9.5v.5"/>',
+  turma:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18 14a6.5 6.5 0 013.5 6"/>',
+  familia:'<path d="M3 11l9-7 9 7v9H3z"/><path d="M12 18s-3-1.8-3-4a1.6 1.6 0 013-.8 1.6 1.6 0 013 .8c0 2.2-3 4-3 4z"/>',
+  esporte:'<circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5l3 7M10 9l2 7M13 6h3"/>',
+  ensino:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5M8 7h7M8 11h5"/>',
+  oracao:'<path d="M12 21c-4 0-6.5-2.6-6.5-6 0-3.5 3-5.5 3.5-9 2 1 3.5 3 3.5 5 1-.6 1.7-1.8 2-3 1.8 1.6 4 4 4 7 0 3.4-2.5 6-6.5 6z"/>',
+  saude:'<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/>',
+  bastidores:'<path d="M14.5 5.5l4 4"/><path d="M12 8l4 4-8.5 8.5a2.8 2.8 0 01-4-4z"/><path d="M15 3l6 6-2 2-6-6z"/>',
+  animais:'<circle cx="6.5" cy="10" r="1.8"/><circle cx="10" cy="6" r="1.8"/><circle cx="14.5" cy="6" r="1.8"/><circle cx="18" cy="10" r="1.8"/><path d="M12 12c-3 0-5.5 3.5-5.5 6 0 1.5 1.2 2 2.5 1.6 1-.3 2-.6 3-.6s2 .3 3 .6c1.3.4 2.5-.1 2.5-1.6 0-2.5-2.5-6-5.5-6z"/>'
+};
+const AREAS = [
+  {id:'musica', n:'Música e louvor', h:'Cantar, tocar, mexer com som', c:'#C2255C', k:'musica cantar cantor cantora voz vocal canto tocar instrumento instrumental violao guitarra baixo bateria teclado piano banda louvor coral som audio'},
+  {id:'artes', n:'Artes e criatividade', h:'Dança, teatro, design, decoração', c:'#9C36B5', k:'arte artes danca ballet jazz teatro atuar desenho desenhar design criativo decoracao pintura ilustracao'},
+  {id:'midia', n:'Mídia, foto e vídeo', h:'Fotografar, filmar, redes sociais', c:'#D9480F', k:'midia foto fotografia fotografar camera video filmar filmagem edicao editar redes sociais instagram youtube stories comunicacao jornalismo'},
+  {id:'tecnologia', n:'Tecnologia', h:'Computador, app, internet, luz', c:'#1C6DD0', k:'tecnologia computador programacao programador desenvolvedor software ti app aplicativo internet wifi rede sistema luz iluminacao'},
+  {id:'negocios', n:'Negócios e finanças', h:'Empreender, finanças, direito', c:'#8A5A00', k:'negocio negocios empreender empreendedor empresa empresario financas dinheiro advogado direito juridico vendas'},
+  {id:'acolher', n:'Receber e cuidar de pessoas', h:'Recepção, novos membros, pastoreio', c:'#E8590C', k:'receber recepcao acolher acolhimento visitantes cuidar pessoas conversar pastoreio novos membros'},
+  {id:'social', n:'Ação social e missões', h:'Ajudar quem precisa, evangelizar', c:'#2B8A3E', k:'social ajudar doar doacao voluntario missao missoes evangelismo presidio dependencia adocao surdos'},
+  {id:'criancas', n:'Ensinar crianças e adolescentes', h:'Kids, pré-adolescentes, teens', c:'#F08C00', k:'crianca criancas kids infantil ensinar professor tia teen adolescente'},
+  {id:'turma', n:'Sua turma por fase da vida', h:'Jovens, mulheres, homens, 60+', c:'#3B4CC0', k:'jovens juventude mulheres homens idosos terceira idade adolescentes universitarios solteiros'},
+  {id:'familia', n:'Família e relacionamentos', h:'Namoro, noivado, pais, adoção', c:'#C92A2A', k:'familia casal casais namoro noivos casamento pais filhos adocao relacionamento'},
+  {id:'esporte', n:'Esporte e aventura', h:'Correr, pedalar, moto, cavalo, pesca', c:'#0B7A94', k:'esporte esportes corrida correr caminhada bike bicicleta pedalar ciclismo moto cavalo cavalgada pesca pescar aventura'},
+  {id:'ensino', n:'Estudo e idiomas', h:'Teologia, cursos, idiomas, livros', c:'#5F3DC4', k:'estudo estudar ensino curso teologia biblia idioma idiomas ingles traducao libras livro livros leitura'},
+  {id:'oracao', n:'Oração e vida espiritual', h:'Orar, interceder, retiros', c:'#0E6B5C', k:'oracao orar interceder intercessao retiro espiritual jejum'},
+  {id:'saude', n:'Saúde e bem-estar', h:'Saúde, emocional, inclusão', c:'#0CA678', k:'saude medico medica enfermeiro enfermeira psicologo dentista fisioterapeuta emocional mental inclusao primeiros socorros'},
+  {id:'bastidores', n:'Bastidores e estrutura', h:'Organizar, construir, segurança', c:'#495057', k:'bastidores organizar organizacao construcao reforma consertar manutencao seguranca estacionamento apoio diacono secretaria'},
+  {id:'animais', n:'Animais e natureza', h:'Bichos, plantas, vida no campo', c:'#5C940D', k:'animal animais cachorro gato pet bicho plantas jardim natureza campo roca'}
+];
+const AREA = Object.fromEntries(AREAS.map(a => [a.id, a]));
+
+const PUBS = [
+  ['mulheres','Mulheres'],['homens','Homens'],['casais','Casais e famílias'],['jovens','Jovens e jovens adultos'],
+  ['adolescentes','Adolescentes'],['criancas','Crianças'],['idosos','60+'],['solteiros','Solteiros'],['profissionais','Profissionais da área']
+];
+const PUB = Object.fromEntries(PUBS);
+const MODE_TXT = {s:'Para servir', p:'Para participar', a:'Servir e participar'};
+
+/* ================= MINISTÉRIOS (dados do site atual) =================
+   m: s = servir como voluntário · p = participar/receber · a = os dois
+   p: públicos específicos (vazio = todos) · t: palavras para a busca     */
+const M = [
+ {n:'Artes', g:['artes'], m:'a', p:[], t:'danca ballet jazz contemporaneo danca de rua teatro espetaculo musical atuar aulas', r:'Rosângela Borges', c:[['','(34) 99990-9357']],
+  d:'Esse é o Ministério de Artes. Nossa missão é levar a palavra de Deus e as boas novas de Salvação por todos os lugares através da arte - com danças, peças teatrais, espetáculos e musicais. Atualmente, trabalhamos com dança (ballet, jazz, contemporâneo e dança de rua), além de teatro. Temos aulas semanalmente, estudo e prática da técnica das modalidades.'},
+ {n:'Arca de Noé', g:['animais','social'], m:'s', p:[], t:'animais cachorro gato resgate adocao pet veterinario', r:'Rodrigo Nicolau', c:[['','(34) 98821-7618']],
+  d:'Ministério com o propósito de resgatar, tratar, cuidar e direcionar os animais resgatados para adoção.\n"Por isso, a criação aguarda ansiosamente a manifestação dos filhos de Deus" - Romanos 8.19'},
+ {n:'Apascentar', g:['acolher','oracao'], m:'s', p:[], t:'pastoreio ligacoes mensagens whatsapp cuidado ovelhas', r:'Pra. Kelle', c:[['','(31) 99477-6089']],
+  d:'Um ministério de pastoreio onde o objetivo é derramar amor na vida das ovelhas do IMAGINE e fazer com que elas se sintam amadas, pertencentes e entenderem o quanto são importantes para nós.\nAs ações do ministério: ligações e envio pelo WhatsApp de mensagens padronizadas.\n"... Pedro Tu me amas? Sim senhor eu te amo. Apascenta minhas ovelhas..." (João 21:16)'},
+ {n:'Aplicativo', g:['tecnologia'], m:'s', p:[], t:'app celular gestao conteudo aplicativo', r:'Lucas Lopes', c:[['','(34) 99796-3328']], d:'Gestão do Aplicativo.', short:true},
+ {n:'Background', g:['midia','tecnologia'], m:'s', p:[], t:'telao projecao letras slides computador culto', r:'Ádryla', c:[['','(34) 99260-9061']],
+  d:'Nosso ministério consiste no manuseio e projeção de tudo que é transmitido nos telões da igreja. Nossa missão é impactar vidas através de cada letra, aviso e imagem que projetamos. É auxiliar o irmão que está cultuando, a louvar e adorar a Deus verdadeiramente.'},
+ {n:'Bom Samaritano', g:['social','saude'], m:'s', p:[], t:'social assistencia educacao saude vulnerabilidade reintegracao doacao voluntariado', r:'Tatiane e Rafael Mota', c:[['','(34) 99891-2737']], l:['Entrar no grupo do WhatsApp','https://chat.whatsapp.com/KhtAp5aUwtYCVdbOrK4pPv'],
+  d:'Ministério voltado para o cuidado de toda a parte social da cidade, atuando em áreas como assistência, educação, saúde e reintegração. Com o amor de Deus, buscamos transformar vidas, resgatar pessoas em situações de vulnerabilidade e promover uma comunidade mais justa e solidária. Estamos aqui para servir e fazer a diferença em cada área da sociedade.'},
+ {n:'Brigada de Incêndio', g:['bastidores','saude'], m:'s', p:[], t:'bombeiro brigadista primeiros socorros incendio seguranca emergencia', r:'Cláudio', c:[['','(34) 99972-9061']],
+  d:'Ministério de voluntários treinados pelo Corpo de Bombeiros de Uberlândia, capacitados para atuar na prevenção, abandono e combate a um princípio de incêndio e prestar os primeiros socorros, dentro da igreja.'},
+ {n:'Cavalgada', g:['esporte','animais'], m:'a', p:[], t:'cavalo cavalgada rural roca fazenda evangelismo eventos rurais', r:'Saulo', c:[['','(34) 99803-1221']],
+  d:'Ministério de cavalgada com foco voltado para evangelismo e pastoreio através de cavalgadas e eventos rurais.'},
+ {n:'Centésima Ovelha', g:['acolher','oracao'], m:'s', p:[], t:'afastados reconciliacao resgate acolhimento desviados', r:'Ivan e Elysama', c:[['','(34) 99810-6559']],
+  d:'O Ministério Centésima Ovelha busca resgatar e restaurar aqueles que se afastaram, oferecendo acolhimento, esperança e reconciliação com Cristo.'},
+ {n:'Centuriões do Templo', g:['bastidores'], m:'s', p:['profissionais'], t:'seguranca vigilante policial guarda militar', r:'Lucas Costa', c:[['','(34) 99636-4092']],
+  d:'É o ministério que atua na igreja fazendo a segurança dos membros, visitantes, pastores e do templo. Formado, em sua maioria, por profissionais que atuam como seguranças, vigilantes e policiais, prontos para responder a qualquer ocorrência.'},
+ {n:'Check-in Eventos', g:['acolher','bastidores'], m:'s', p:[], t:'eventos credenciamento inscricoes recepcao entrada checkin', r:'Lara', c:[['','(34) 99315-7753']],
+  d:'O Ministério Check-In simplifica e aprimora a experiência de entrada em eventos, garantindo um acolhimento eficiente e hospitaleiro a todos os participantes.'},
+ {n:'Classes', g:['ensino','social'], m:'p', p:[], t:'idiomas ingles espanhol linguas missoes curso aula', r:'Lucas Martins', c:[['','(34) 99907-4284']],
+  d:'Ministério para todos que desejam aprender novos idiomas e se preparar para missões.'},
+ {n:'Começando Certo', g:['familia'], m:'p', p:['casais','jovens'], t:'namoro namorados casal relacionamento santidade', r:'Beto e Raquel', c:[['','(34) 99171-5820']],
+  d:'Um ministério voltado para casais que iniciarão o namoro e casais que já estão namorando que querem aprender através de princípios bíblicos como é um namoro santo.'},
+ {n:'Comunicação', g:['midia'], m:'s', p:[], t:'midia redes sociais instagram comunicacao marketing', r:'Flôr Nascimento', c:[['','(34) 98433-7202']],
+  d:'O Ministério de Comunicação é a força abrangente em todas as formas de mídia.'},
+ {n:'Conexão', g:['acolher'], m:'s', p:[], t:'recepcao receber visitantes boas-vindas cultos porta', r:'Tuany Carvalho', c:[['','(34) 98866-5930']], l:['Preencher o formulário','https://admin.inpeaceapp.com/ministries/8485'],
+  d:'Ministério responsável em recepcionar cada pessoa que chega em nossa Igreja, nos cultos e eventos.'},
+ {n:'Consagração de Filhos', g:['familia','criancas'], m:'p', p:['casais'], t:'consagrar filhos bebe apresentacao criancas pais', r:'Maria Francisca e Nelcir', c:[['','(34) 99154-7477'],['','(34) 99946-5036']],
+  d:'Ministério de consagração de filhos a Deus.'},
+ {n:'Consolidação', g:['acolher'], m:'s', p:[], t:'novos membros batismo transferencia integracao novas vidas', r:'Elysama', c:[['','(34) 99155-1900']],
+  d:'O ministério Imagine Consolidação conecta as novas vidas decididas por Cristo à Igreja. Com a missão de receber, cuidar e integrar os novos membros, seja por batismo ou transferência. Seja parte desse ministério.'},
+ {n:'Coral', g:['musica'], m:'a', p:[], t:'cantar voz canto coral louvor vocal', r:'Clauberth', c:[['','(38) 99895-4105']],
+  d:'Coral que reúne pessoas para louvar a Deus através das vozes.'},
+ {n:'Coral Infantil', g:['musica','criancas'], m:'a', p:['criancas'], t:'criancas cantar voz coral infantil', r:'Virginia', c:[['','(34) 99782-1589']],
+  d:'Coral que reúne crianças para louvar a Deus através das vozes.'},
+ {n:'Creative Designers', g:['artes','midia'], m:'s', p:[], t:'design designer arte grafica photoshop canva ilustracao desenho criacao', r:'Junior', c:[['','(34) 99985-5388']],
+  d:'Criação de artes para as mídias, cultos e conferências.'},
+ {n:'Cristãos Empreendedores', g:['negocios'], m:'a', p:['profissionais'], t:'empreender empresa negocio empresario networking', r:'Marco Aurélio', c:[['','(34) 99162-0542']], d:'Cristãos Empreendedores.', short:true},
+ {n:'Dbike', g:['esporte'], m:'a', p:[], t:'bicicleta bike ciclismo ciclista pedalar pedal', r:'Andrey e Andreia', c:[['','(34) 99690-8881']],
+  d:'Dbike, Ministério de ciclistas da nossa igreja, reúne aqueles que amam andar de bike e utilizam desse talento para servir à cidade.'},
+ {n:'Diaconato', g:['bastidores'], m:'s', p:[], t:'diacono diaconia organizacao culto ceia apoio', r:'Pr. Tenisson Ciodaro', c:[['','(34) 99222-2083']],
+  d:'Ministério responsável pela organização diaconal dos cultos.'},
+ {n:'Diaconato Kids', g:['bastidores','criancas'], m:'s', p:[], t:'kids apoio diacono criancas', r:'Secretaria Imagine', c:[['','(34) 99923-2853']],
+  d:'Ministério de diaconia do Kids de nossa Igreja, responsável em dar suporte ao diaconato adulto nos cultos e eventos do ministério Kids!'},
+ {n:'Empreendedoras Royal Sisters', g:['negocios'], m:'a', p:['mulheres'], t:'empreendedora mulheres negocio empresa', r:'Cintia Sanches', c:[['','(34) 99817-7667']], d:'Ministério Empreendedoras Royal Sisters.', short:true},
+ {n:'Encontro com Deus', g:['oracao'], m:'a', p:[], t:'retiro encontro espiritual face a face', r:'André Pinho e Cláudia', c:[['','(34) 99652-8273']],
+  d:'Ministério Encontro com Deus promove retiros espirituais, proporcionando momentos face a face com Deus.'},
+ {n:'Escola de Noivos', g:['familia'], m:'p', p:['casais'], t:'noivado noivos casamento curso', r:'Kathleen e Maison', c:[['','(34) 99996-1480']],
+  d:'Ministério voltado para casais que pretendem noivar ou já estão noivos, trazendo cursos e pastoreio.'},
+ {n:'Escola de Pais', g:['familia','ensino'], m:'p', p:['casais'], t:'pais filhos educacao curso criacao', r:'Beto e Raquel', c:[['','(34) 99171-5820']],
+  d:'Ministério responsável em ministrar cursos e acompanhar e direcionar os pais nos princípios da palavra de Deus.'},
+ {n:'Ezequias', g:['bastidores','acolher'], m:'s', p:[], t:'servir casa porta zelo apoio comunhao', r:'Márcia', c:[['','(34) 99203-7970']],
+  d:'Convidamos vocês a virem conhecer o Ministério Ezequias, um lugar de comunhão, amor e serviço na casa do Pai. Aqui, todos têm a oportunidade de servir e crescer na fé, compartilhando dons e talentos para a glória de Deus.\n"Pois um dia nos teus átrios vale mais que mil; prefiro estar à porta da casa do meu Deus, a permanecer nas tendas da perversidade." Salmos 84:10'},
+ {n:'Família', g:['familia'], m:'a', p:['casais'], t:'familia faixas etarias integracao', r:'Beto e Raquel', c:[['','(34) 99171-5820']],
+  d:'O IM. Família tem o objetivo de trabalhar de forma integrada todas as fases da vida, em suas diferentes faixas etárias a fim de que todos se desenvolvam como um só corpo, pois foi dessa forma que Deus sonhou a igreja e, por isso, estamos caminhando de acordo com esse propósito.'},
+ {n:'Filmakers', g:['midia','artes'], m:'s', p:[], t:'video filmar camera edicao filmagem filmmaker', r:'Pedro Lima', c:[['','(34) 99814-9019']],
+  d:'Ministério responsável pela criação e gravação de vídeos para todos os ministérios de nossa Igreja.'},
+ {n:'Finanças', g:['negocios','ensino'], m:'p', p:[], t:'financas dinheiro orcamento dividas curso economia', r:'Beto Martins', c:[['','(34) 99171-5820']],
+  d:'Curso de Finanças da nossa igreja, ensinando princípios sólidos para a gestão financeira, promovendo sabedoria e integridade nas finanças pessoais.'},
+ {n:'Flow', g:['midia'], m:'s', p:[], t:'gravacao abertura video cultos eventos', r:'Cadu Carvalho', c:[['','(34) 99672-3921']], d:'Gravação da abertura de cultos e eventos.'},
+ {n:'Gaditas Moto Club', g:['esporte'], m:'a', p:[], t:'moto motociclista motoqueiro estrada viagem motoclube', r:'Henrique Ribeiro', c:[['','(34) 99191-2856']],
+  d:'Moto Clube da Imagine Uberlândia com o propósito de levar a palavra de Deus nas estradas.'},
+ {n:'GI', g:['acolher','oracao'], m:'a', p:[], t:'grupo imagine celula casa pastorear', r:'Pr. Walter e Pra. Eliane', c:[['','(34) 99912-1271']], gi:true,
+  d:'Ministério responsável pelos GIs. O Grupo Imagine é o coração da Imagine Uberlândia como visão, é o nosso DNA: cuidar, amar e pastorear.'},
+ {n:'Guardiã do Lar', g:['artes','acolher'], m:'a', p:['mulheres'], t:'mesa posta decoracao receber hospitalidade casa', r:'Cláudia Pinho', c:[['','(34) 99652-8273']],
+  d:'O Ministério de Mesa Posta dedica-se a criar ambientes acolhedores e significativos, inspirando comunhão através da arte de cuidar da mesa e receber com amor.'},
+ {n:'Homem de Valor', g:['turma','familia'], m:'p', p:['homens'], t:'homens', r:'Beto Martins', c:[['','(34) 99171-5820']], d:'Ministério Homem de Valor.', short:true},
+ {n:'Hype', g:['turma'], m:'a', p:['jovens'], t:'jovens juventude culto jovem', r:'Pr. Luiz Henrique e Pra. Camila Barah', c:[['Pr. Luiz Henrique','(47) 99632-1657'],['Pra. Camila Barah','(34) 99181-9595']],
+  d:'Bem-vindo ao Hype! Que o mundo veja em nós a evidência do amor sem limites, da graça abundante e a resposta exagerada de Jesus para essa geração.\nA sua passagem foi paga com preço de sangue, agora cabe a você a decisão de trilhar esse caminho de propósito eterno. Somos a resposta exagerada de Deus. Somos HYPE.'},
+ {n:'Iluminação', g:['tecnologia','bastidores'], m:'s', p:[], t:'luz iluminacao palco eventos', r:'John', c:[['','(34) 98899-5844']],
+  d:'Ministério responsável pela iluminação dos cultos e eventos de nossa Igreja.'},
+ {n:'Imagine News', g:['midia'], m:'s', p:[], t:'noticias jornalismo escrita reportagem escrever', r:'Flôr Nascimento', c:[['','(34) 98433-7202']], d:'Ministério Imagine News.', short:true},
+ {n:'Imagine uma Foto', g:['midia','artes'], m:'s', p:[], t:'foto fotografia camera fotografo', r:'Luis Felipe Silva', c:[['','(34) 99876-5554']],
+  d:'Ministério que atua nos cultos e eventos da Imagine Church, registrando em fotos o que vivemos em nossa Igreja.'},
+ {n:'Inclusão Kids', g:['criancas','saude'], m:'s', p:[], t:'criancas atipicas autismo tea inclusao deficiencia', r:'Leordina Tristão', c:[['','(34) 99813-8235']], d:'Crianças atípicas.', short:true},
+ {n:'Intercessão', g:['oracao'], m:'a', p:[], t:'oracao orar interceder guerrear', r:'Pra. Eliane Procópio', c:[['','(34) 99915-4331']],
+  d:'Intercessão é o ministério responsável por orar, guerrear e interceder por nossa Igreja, seja no momento do culto ou fora dele.'},
+ {n:'Jardim do Éden', g:['animais','bastidores'], m:'s', p:[], t:'plantas jardim jardinagem flores paisagismo', r:'Pâmella', c:[['','(34) 98803-0072']],
+  d:'Ministério dedicado a cuidar de plantas e jardim de nossa igreja!\n"E plantou o Senhor Deus um jardim no Éden!"'},
+ {n:'Jus Dei', g:['negocios','social'], m:'s', p:['profissionais'], t:'advogado advogada direito juridico justica', r:'Elaine Naves', c:[['','(34) 99652-8643']],
+  d:'O ministério Jus Dei é composto por advogados. Ele visa praticar a justiça, que é a expressão da vontade de Deus, atuando no atendimento jurídico.'},
+ {n:'Kids', g:['criancas'], m:'s', p:[], t:'criancas 2 a 9 anos ensinar biblia professor professora tia', r:'Pra. Nathalya Zanoni', c:[['','(34) 99717-7390']], l:['Grupo de voluntários no WhatsApp','https://chat.whatsapp.com/LZAwF1fjZR2H9M8cLZSc4H'],
+  d:'O IM. Kids é o Ministério responsável por pastorear e discipular as crianças de 2 a 9 anos. Em todos os cultos temos uma equipe preparada para ensinar a Bíblia às crianças e conduzi-las à intimidade com Deus.'},
+ {n:'Libras Ephatá', g:['social','ensino'], m:'s', p:[], t:'libras surdos lingua de sinais interprete', r:'Suzana', c:[['','(21) 96922-0594']],
+  d:'Ministério com o objetivo de auxiliar os surdos nas áreas social, espiritual e emocional e faz a interpretação nos cultos ao vivo de nossa igreja. O ministério abrange surdos de qualquer idade.'},
+ {n:'Livraria Seara', g:['ensino','negocios'], m:'s', p:[], t:'livros livraria leitura vendas presentes', r:'Pra. Kelle', c:[['','(31) 99477-6089']],
+  d:'Livraria da nossa Igreja, responsável em fornecer literatura cristã, brindes e presentes para toda a família.'},
+ {n:'Lucas', g:['saude','social'], m:'s', p:['profissionais'], t:'medico medica enfermeiro enfermeira saude dentista psicologo fisioterapeuta farmaceutico', r:'Mauriê', c:[['','(62) 98594-5664']],
+  d:'Lucas é um ministério da Imagine que, além de promover o relacionamento de profissionais de saúde comprometidos com o Reino de Deus, planeja, identifica, executa e apoia ações que permitem proporcionar as virtudes de Cristo por meio do cuidado e do amor ao próximo.'},
+ {n:'Maximus', g:['turma'], m:'p', p:['homens'], t:'homens', r:'Beto Martins', c:[['','(34) 99171-5820']], d:'Ministério de Homens da Imagine Uberlândia.'},
+ {n:'Melhor Idade', g:['turma'], m:'p', p:['idosos'], t:'60+ terceira idade idosos culto domingo', r:'Pr. Everton e Pra. Daniela', c:[['Pr. Everton','(34) 99998-0213'],['Pra. Daniela','(34) 99655-0245']],
+  d:'O ministério Melhor Idade é o ministério para irmãos e irmãs maiores de 60 anos. Ministério dinâmico, vivo, cheio de Deus. Promovendo o social, saúde física, mental e sobretudo o espiritual.\nAos domingos às 9h, temos nosso culto ao Senhor com ambiente sonoro adequado, músicas antigas e a mensagem da Palavra de Deus.\n"O melhor tempo da sua vida é agora!"'},
+ {n:'Mentes Transformadas', g:['saude'], m:'p', p:['mulheres'], t:'saude mental emocional ansiedade depressao mulheres', r:'Kellen Braga', c:[['','(34) 99996-3080']],
+  d:'Ministério Mentes Transformadas auxilia na saúde mental e emocional das mulheres.'},
+ {n:'Alicerce', g:['social','saude'], m:'s', p:[], t:'dependencia quimica alcool drogas recuperacao vicio', r:'Pr. Leonardo e Pra. Alessandra', c:[['','34 9 99995-7070']], noTitle:true,
+  d:'O Ministério Alicerce atua no cuidado e apoio de pessoas que enfrentam a dependência química e do álcool, promovendo acolhimento, orientação e acompanhamento.\nO projeto realiza encaminhamentos para casas de apoio e recuperação, além de visitas e acompanhamento de pessoas em tratamento, levando a Palavra de Deus, apoio e esperança.'},
+ {n:'Neemias', g:['bastidores'], m:'s', p:['profissionais'], t:'construcao reforma pedreiro eletricista encanador pintor reparos obra', r:'Gesiel Carvalho', c:[['','(34) 99152-5930']],
+  d:'Ministério com profissionais diversos que servem de forma voluntária à nossa igreja em construções, reformas e reparos.'},
+ {n:'Nesher', g:['turma'], m:'p', p:['jovens'], t:'jovens adultos 30+ trinta', r:'Gesiel e Tuany', c:[['','(34) 99152-5930']], l:['Entrar no grupo do WhatsApp','https://chat.whatsapp.com/BUEJn8T1AOMG9zYCmNUxe2'],
+  d:'Ministério de Jovens Adultos 30+.'},
+ {n:'Parking', g:['bastidores'], m:'s', p:[], t:'estacionamento carros area externa', r:'Rone Mendonça', c:[['','(34) 99153-4185']], d:'O Ministério Parking cuida da parte externa da igreja.'},
+ {n:'Pescaria', g:['esporte','animais'], m:'p', p:[], t:'pesca pescar rio peixe', r:'Marcelo Machado', c:[['','(34) 9151-0560']],
+  d:'Desfrute de momentos de comunhão e evangelismo na pescaria da nossa igreja.'},
+ {n:'Programa Imagine', g:['midia'], m:'s', p:[], t:'tv televisao programa gravacao', r:'Cadu Carvalho', c:[['','(34) 99672-3921']], d:'Vivencie os bastidores da gravação do nosso programa de TV.'},
+ {n:'Recomeçando Certo', g:['turma','familia'], m:'p', p:['solteiros','jovens'], t:'solteiros jovens adultos santidade', r:'Beto Martins', c:[['','(34) 99171-5820']], d:'Jovens adultos solteiros em santidade.'},
+ {n:'Resgate', g:['social'], m:'s', p:[], t:'presidio capelania evangelismo prisao', r:'Douglas e Ruskaia', c:[['','(34) 98849-7416']], d:'Evangelismo em presídios e capelania.'},
+ {n:'Retiro da Família', g:['familia','bastidores'], m:'a', p:['casais'], t:'retiro familia eventos organizacao', r:'Alessandra Santos', c:[['','(34) 99163-3159']],
+  d:'Ministério responsável em organizar os retiros voltados às famílias da Imagine Uberlândia.'},
+ {n:'Royal Sisters', g:['turma'], m:'p', p:['mulheres'], t:'mulheres', r:'Pra. Eliane Procópio', c:[['','(34) 99915-4331']],
+  d:'Ministério de Mulheres da Igreja Batista Imagine. Somos mulheres reais, filhas do Rei, chamadas para servir cidades e nações.'},
+ {n:'Run', g:['esporte','saude'], m:'a', p:[], t:'corrida caminhada correr caminhar', r:'Cristina', c:[['','(34) 99859-2928']],
+  d:'RUN é um ministério de caminhada e corrida vinculado à nossa casa Batista Imagine. Tem como base três pilares: saúde, comunhão e evangelização, para atrair, desenvolver e enviar pessoas em Jesus através desse esporte.'},
+ {n:'Secretaria Office', g:['bastidores','acolher'], m:'s', p:[], t:'secretaria atendimento administrativo escritorio', r:'Jenny Souza', c:[['','(34) 99950-9550']],
+  d:'A Secretaria tem como objetivo atender todos os membros da Imagine Uberlândia, com informações e direcionamentos conforme a necessidade dos membros.'},
+ {n:'Seminário Teológico Imagine', g:['ensino'], m:'p', p:[], t:'teologia biblia estudo seminario curso vocacao', r:'Ricardo Ferreira', c:[['','(31) 98589-9044']],
+  d:'O Seminário Teológico da Imagine dá vazão ao aprendizado das Escrituras e da Teologia, para todos que são vocacionados e que também desejam conhecer mais das Escrituras.'},
+ {n:'Siga', g:['criancas','turma'], m:'a', p:['adolescentes'], t:'pre-adolescentes 10 a 13 anos', r:'Rodrigo Valverde', c:[['','(34) 99280-7900']],
+  d:'O Siga é o Ministério responsável por pastorear e discipular os pré-adolescentes de 10 a 13 anos.'},
+ {n:'Story Makers', g:['midia'], m:'s', p:[], t:'stories instagram video celular', r:'Vinicius Lopes', c:[['','(34) 99215-5202']],
+  d:'Ministério de produção de stories, responsável por captar, através de vídeos, tudo que acontece em Imagine Uberlândia.'},
+ {n:'Técnica', g:['tecnologia','musica'], m:'s', p:[], t:'som sonoplastia mesa de som audio tecnico', r:'Leonardo Pacheco', c:[['','(19) 98128-8854']],
+  d:'Ministério responsável por toda parte técnica de nossa igreja que envolve a sonoplastia.'},
+ {n:'Tecnologia', g:['tecnologia'], m:'s', p:['profissionais'], t:'programacao programador desenvolvimento software ti computador sistemas', r:'Pr. Cézar Damasceno', c:[['','(31) 99995-1416']],
+  d:'Ministério de voluntários da área de tecnologia e desenvolvimento que servem em nossa Igreja.'},
+ {n:'Teen', g:['turma','criancas'], m:'a', p:['adolescentes'], t:'adolescentes teens legado', r:'Kapilca e Rubenita', c:[['','(34) 99855-7753']],
+  d:'Entendemos que a juventude de hoje tem um grande legado: compartilhar o amor de Deus às pessoas que ainda não o conhecem. Nós, como adolescentes de Imagine Uberlândia, sabemos que a nossa missão é ser como cartas vivas para os jovens da nossa cidade.'},
+ {n:'Tradução Cultos', g:['ensino'], m:'s', p:[], t:'ingles traducao simultanea idiomas interprete', r:'Pedro Marsi', c:[['','(34) 99909-5030']], d:'Tradução simultânea dos cultos para o inglês.'},
+ {n:'Transmissão', g:['midia','tecnologia'], m:'s', p:[], t:'live youtube transmissao streaming camera instagram facebook', r:'Matheus', c:[['','(34) 99929-7710']],
+  d:'Ministério que transmite os cultos e eventos de nossa Igreja no YouTube, Instagram, Facebook e em nosso aplicativo.'},
+ {n:'Universitários Cristãos', g:['turma','ensino'], m:'p', p:['jovens'], t:'faculdade universidade estudante universitario', r:'Fernando Brasão', c:[['','(34) 99173-0404']], d:'Ministério Universitários Cristãos.', short:true},
+ {n:'Voluntários', g:['acolher','bastidores'], m:'s', p:[], t:'voluntariado cuidar dos voluntarios', r:'Pra. Dani', c:[['','(34) 99655-0245']], d:'Excelência em serviço aos voluntários.'},
+ {n:'WiFi', g:['tecnologia','bastidores'], m:'s', p:[], t:'internet rede wi-fi wifi', r:'Andrey', c:[['','(34) 99690-8881']], d:'Manutenção do Wi-Fi.'},
+ {n:'Raízes de Amor', g:['familia','social'], m:'a', p:[], t:'adocao adotar crianca adolescente', r:'Beto Martins', c:[['','(34) 99171-5820']],
+  d:'Nós acreditamos no Deus que adota. No Pai que nos escolheu primeiro. No Cristo que nos enxertou em Sua família. E no Espírito que transforma lares comuns em terrenos férteis de cura e futuro.\nSe você tem interesse em adotar uma criança ou adolescente, ou quer saber como funciona o processo de adoção, entre em contato conosco!'},
+ {n:'Worship', g:['musica'], m:'s', p:[], t:'louvor banda cantar tocar violao guitarra bateria teclado baixo instrumento vocal ministro', r:'Clauberth Gomes', c:[['','(38) 99895-4105']],
+  d:'IM. Worship é o Ministério de Louvor da nossa Igreja, conduzindo toda a igreja a uma vida de louvor e adoração.'}
+];
+
+/* imagens: pasta img/ ao lado desta página (cor de fundo = cor da borda da arte) */
+const IMG = {"artes": "#000000", "arca-de-noe": "#0e2c3d", "apascentar": "#c8dbbf", "aplicativo": "#000000", "background": "#030406", "bom-samaritano": "#482926", "brigada-de-incendio": "#f70009", "cavalgada": "#180f00", "centesima-ovelha": "#fcfcfc", "check-in-eventos": "#000000", "classes": "#000000", "comecando-certo": "#082a47", "comunicacao": "#072e46", "conexao": "#ffd401", "consolidacao": "#000000", "coral": "#072e46", "coral-infantil": "#072e46", "creative-designers": "#960adf", "dbike": "#ffffff", "diaconato-kids": "#000000", "encontro-com-deus": "#f70009", "escola-de-noivos": "#072e46", "escola-de-pais": "#072e46", "ezequias": "#47c2fe", "familia": "#612000", "financas": "#0b3042", "flow": "#072e46", "hype": "#eeefab", "iluminacao": "#f70009", "imagine-uma-foto": "#ee1d23", "inclusao-kids": "#6924a5", "intercessao": "#717171", "jardim-do-eden": "#050e01", "jus-dei": "#004aad", "kids": "#6924a5", "libras-ephata": "#f5f8ff", "lucas": "#545454", "maximus": "#004aad", "melhor-idade": "#798c0e", "mentes-transformadas": "#c99d92", "neemias": "#fe3c00", "nesher": "#485a68", "parking": "#f5f8ff", "programa-imagine": "#033047", "resgate": "#ffffff", "retiro-da-familia": "#fab363", "royal-sisters": "#ffffff", "run": "#34cc67", "seminario-teologico-imagine": "#000000", "story-makers": "#030406", "tecnica": "#001ad3", "teen": "#000000", "traducao-cultos": "#052c44", "transmissao": "#000000", "voluntarios": "#ffffff", "wifi": "#042d43", "raizes-de-amor": "#000000", "worship": "#f0eee2"};
+
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+const slug = s => norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const icon = (id, cls='i') => `<svg class="${cls}" viewBox="0 0 24 24">${I[id]}</svg>`;
+const STAR = '<svg class="i" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>';
+const WA = '<svg class="i" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4.1A8.5 8.5 0 1 1 8 19.6z"/></svg>';
+/* ================= dados editáveis (Admin) ================= */
+const SEED = M.map(m => ({...m, id: slug(m.n), ativo: true}));
+const DKEY = 'imagine-ministerios-dados-v1';
+const DERIVED = ['c0','ini','hay','_direct','short'];
+const strip = m => Object.fromEntries(Object.entries(m).filter(([k]) => !DERIVED.includes(k)));
+function prep(m){
+  m.g = (m.g || []).filter(g => AREA[g]); if (!m.g.length) m.g = ['bastidores'];
+  m.p = m.p || []; m.c = (m.c || []).filter(c => c && (c[1] || '').trim()); m.t = m.t || ''; m.m = m.m || 'a';
+  m.c0 = AREA[m.g[0]].c;
+  m.ini = m.n.split(/\s+/).filter(w => w.length > 2 || /^[A-Z]/.test(w)).slice(0,2).map(w => w[0]).join('').toUpperCase() || m.n.slice(0,2).toUpperCase();
+  m.hay = {n:norm(m.n), t:norm(m.t), d:norm(m.d), r:norm(m.r + ' ' + m.c.map(c => c[1].replace(/\D/g,'')).join(' ')), g:m.g.map(g => norm(AREA[g].n + ' ' + AREA[g].k)).join(' ')};
+  m.short = (m.d || '').trim().length < 40;
+}
+let DATA = null;
+try { DATA = JSON.parse(localStorage.getItem(DKEY) || 'null'); } catch(e){}
+if (!Array.isArray(DATA) || !DATA.length) DATA = JSON.parse(JSON.stringify(SEED));
+let BY = {};
+function reindex(){ DATA.forEach(prep); BY = Object.fromEntries(DATA.map(m => [m.id, m])); }
+reindex();
+const ACT = () => DATA.filter(m => m.ativo !== false);
+function saveData(){
+  try { localStorage.setItem(DKEY, JSON.stringify(DATA.map(strip))); return true; }
+  catch(e){ toast('Não deu para salvar: o navegador ficou sem espaço. Tente uma imagem menor.'); return false; }
+}
+const artSrc = m => m.img || (!m.noArt && IMG[m.id] ? `img/${m.id}.jpg` : '');
+const artBg = m => m.img ? (m.imgBg || '#111') : IMG[m.id];
+const digits = s => s.replace(/\D/g,'');
+const phoneOk = s => { const d = digits(s); return d.length === 11 && d[2] === '9'; };
+const firstName = s => s.replace(/^(Pr\.|Pra\.|Pastora|Pastor)\s*/i,'').split(/\s+e\s+|\s+/)[0];
+function waLink(m, tel, who){
+  const msg = `Olá, ${firstName(who || m.r)}! Vi o ministério ${m.n} no app da Imagine e quero saber como faço para participar.`;
+  return `https://wa.me/55${digits(tel)}?text=${encodeURIComponent(msg)}`;
+}
+let toastT;
+function toast(t){ const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 2600); }
+async function copy(text, okMsg){
+  try { await navigator.clipboard.writeText(text); toast(okMsg); }
+  catch(e){ toast(text); }
+}
+
+/* favorites */
+const FKEY = 'imagine-ministerios-favs';
+let favs = new Set();
+try { favs = new Set(JSON.parse(localStorage.getItem(FKEY) || '[]')); } catch(e){}
+const saveFavs = () => { try { localStorage.setItem(FKEY, JSON.stringify([...favs])); } catch(e){} $('#fav-count').textContent = favs.size; };
+saveFavs();
+
+/* ================= search ================= */
+function search(q){
+  const toks = norm(q).split(/[^a-z0-9+]+/).filter(t => t.length >= 2);
+  if (!toks.length) return null;
+  const out = [];
+  for (const m of ACT()){
+    let score = 0, ok = true;
+    for (const t of toks){
+      let s = 0;
+      if (m.hay.n.split(/\s+/).some(w => w.startsWith(t))) s = 10;
+      else if (m.hay.n.includes(t)) s = 8;
+      else if (m.hay.t.split(/\s+/).some(w => w.startsWith(t))) s = 6;
+      else if (m.hay.r.includes(t)) s = 5;
+      else if (m.hay.g.split(/\s+/).some(w => w.startsWith(t))) s = 3;
+      else if (t.length >= 4 && m.hay.d.includes(t)) s = 2;
+      if (!s){ ok = false; break; }
+      score += s;
+    }
+    if (ok){ m._direct = score / toks.length >= 5; out.push([m, score]); }
+  }
+  return out.sort((a,b) => b[1] - a[1] || a[0].n.localeCompare(b[0].n,'pt')).map(x => x[0]);
+}
+function hl(text, q){
+  const toks = norm(q).split(/[^a-z0-9+]+/).filter(t => t.length >= 2);
+  if (!toks.length) return esc(text);
+  const n = norm(text); const marks = [];
+  toks.forEach(t => { let i = n.indexOf(t); while (i >= 0){ marks.push([i, i + t.length]); i = n.indexOf(t, i + t.length); } });
+  if (!marks.length) return esc(text);
+  marks.sort((a,b) => a[0]-b[0]);
+  let res = '', pos = 0;
+  for (const [a,b] of marks){ if (a < pos) continue; res += esc(text.slice(pos,a)) + '<mark>' + esc(text.slice(a,b)) + '</mark>'; pos = b; }
+  return res + esc(text.slice(pos));
+}
+
+/* ================= state ================= */
+const st = {q:'', areas:new Set(), mode:'', pub:'', view:'grupos', favs:false};
+/* áreas abertas no modo "Por área" (lembradas neste aparelho) */
+const OKEY = 'imagine-ministerios-abertas';
+let openAreas = new Set();
+try { openAreas = new Set(JSON.parse(localStorage.getItem(OKEY) || '[]')); } catch(e){}
+const closedSel = new Set(); // áreas filtradas que a pessoa fechou
+const saveOpen = () => { try { localStorage.setItem(OKEY, JSON.stringify([...openAreas])); } catch(e){} };
+function toggleArea(id){
+  if (st.areas.size){ closedSel.has(id) ? closedSel.delete(id) : closedSel.add(id); }
+  else { openAreas.has(id) ? openAreas.delete(id) : openAreas.add(id); saveOpen(); }
+  renderResults();
+  const sec = document.getElementById('g-' + id);
+  if (sec && sec.classList.contains('open')){
+    const top = sec.getBoundingClientRect().top;
+    if (top < 120 || top > window.innerHeight * 0.6) sec.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+const modeOk = m => !st.mode || m.m === 'a' || m.m === st.mode;
+const pubOk = m => !st.pub || m.p.includes(st.pub);
+function base(){ // everything except areas
+  let list = st.q ? (search(st.q) || []) : ACT();
+  return list.filter(m => modeOk(m) && pubOk(m) && (!st.favs || favs.has(m.id)));
+}
+function current(){
+  const b = base();
+  return st.areas.size ? b.filter(m => m.g.some(g => st.areas.has(g))) : b;
+}
+
+/* ================= render: tiles ================= */
+function renderTiles(){
+  const b = base();
+  $('#tiles').innerHTML = AREAS.map(a => {
+    const n = b.filter(m => m.g.includes(a.id)).length;
+    return `<button type="button" class="tile ${n ? '' : 'zero'}" style="--c:${a.c}" data-area="${a.id}" aria-pressed="${st.areas.has(a.id)}">
+      <span class="ti">${icon(a.id)}</span><b>${a.n}</b><small>${a.h}</small><span class="n">${n}</span></button>`;
+  }).join('');
+}
+
+/* ================= render: cards ================= */
+function cover(m, cls=''){
+  const gen = `<div class="cover gen ${cls}" style="--c:${m.c0}"${cls ? '' : ` data-open="${m.id}" role="button" tabindex="-1"`}><span class="gm">im.</span>${icon(m.g[0])}<b>${esc(m.n)}</b></div>`;
+  const src = artSrc(m);
+  if (!src) return gen;
+  return `<div class="cover ${cls}" style="--bg:${artBg(m)}"${cls ? '' : ` data-open="${m.id}" role="button" tabindex="-1"`}><img src="${src}" alt="Arte do ministério ${esc(m.n)}" loading="lazy" data-gen="${esc(gen)}"></div>`;
+}
+// imagem não encontrada → troca pela capa gerada
+document.addEventListener('error', e => {
+  const im = e.target; if (!(im instanceof HTMLImageElement) || !im.dataset.gen) return;
+  const box = im.closest('.cover'); const tmp = document.createElement('div'); tmp.innerHTML = im.dataset.gen;
+  const g = tmp.firstElementChild; if (box.classList.contains('m-cover')) g.classList.add('m-cover');
+  box.replaceWith(g);
+}, true);
+function card(m, opts={}){
+  const tel = m.c[0] ? m.c[0][1] : '';
+  const why = opts.why ? `<div class="why">${opts.why}</div>` : '';
+  const q = st.q;
+  return `<article class="card" style="--c:${m.c0}">
+    ${opts.noCover ? '' : cover(m)}
+    <button class="star" type="button" data-fav="${m.id}" aria-pressed="${favs.has(m.id)}" aria-label="${favs.has(m.id) ? 'Remover dos salvos' : 'Salvar'} ${esc(m.n)}">${STAR}</button>
+    <div class="card-top">
+      <span class="mono" aria-hidden="true">${esc(m.ini)}</span>
+      <div class="card-t"><h4>${hl(m.n, q)}</h4><div class="who">${hl(m.r, q)}</div></div>
+    </div>
+    ${why}
+    <p>${hl(m.d.replace(/\n/g,' '), q)}</p>
+    <div class="tags">${m.g.map(g => `<span class="tag" style="--c:${AREA[g].c}">${AREA[g].n}</span>`).join('')}<span class="tag mode">${MODE_TXT[m.m]}</span>${m.p.map(p => `<span class="tag mode">${PUB[p]}</span>`).join('')}</div>
+    <div class="card-a">
+      <button class="btn btn-sm" type="button" data-open="${m.id}">Ver detalhes</button>
+      ${phoneOk(tel) ? `<a class="btn btn-sm btn-wa" href="${waLink(m, tel, m.c[0][0])}" target="_blank" rel="noopener">${WA}WhatsApp</a>` : `<button class="btn btn-sm" type="button" data-open="${m.id}">Ver contato</button>`}
+    </div>
+  </article>`;
+}
+
+function renderActive(){
+  const pills = [];
+  if (st.q) pills.push(`<span class="pill">Busca: “${esc(st.q)}”<button type="button" data-rm="q" aria-label="Remover busca">×</button></span>`);
+  st.areas.forEach(a => pills.push(`<span class="pill" style="--c:${AREA[a].c}">${AREA[a].n}<button type="button" data-rm="area:${a}" aria-label="Remover ${AREA[a].n}">×</button></span>`));
+  if (st.mode) pills.push(`<span class="pill">${st.mode === 's' ? 'Quero servir' : 'Quero participar'}<button type="button" data-rm="mode" aria-label="Remover">×</button></span>`);
+  if (st.pub) pills.push(`<span class="pill">Para: ${PUB[st.pub]}<button type="button" data-rm="pub" aria-label="Remover">×</button></span>`);
+  if (st.favs) pills.push(`<span class="pill">Só salvos<button type="button" data-rm="favs" aria-label="Remover">×</button></span>`);
+  if (pills.length > 1) pills.push(`<button class="btn btn-ghost btn-sm" type="button" data-rm="all">Limpar tudo</button>`);
+  $('#active').innerHTML = pills.join('');
+  $('#active').hidden = !pills.length;
+}
+
+function renderResults(){
+  const list = current();
+  const n = list.length;
+  $('#count').innerHTML = `<b>${n}</b> ${n === 1 ? 'ministério' : 'ministérios'}${n !== ACT().length ? ` de ${ACT().length}` : ''}`;
+  const R = $('#results');
+  if (!n){
+    const sug = AREAS.filter(a => base().some(m => m.g.includes(a.id))).slice(0,4);
+    R.innerHTML = `<div class="empty"><b>${st.favs && !favs.size ? 'Você ainda não salvou nenhum ministério' : 'Nenhum ministério encontrado'}</b>
+      ${st.favs && !favs.size ? 'Toque na estrela de um ministério para guardar aqui.' : 'Tente outra palavra ou tire algum filtro.'}
+      <div class="try" style="justify-content:center;margin-top:14px">${sug.map(a => `<button type="button" data-area-only="${a.id}">${a.n}</button>`).join('')}<button type="button" data-rm="all">Ver todos</button></div></div>`;
+    return;
+  }
+  if (st.q && !st.areas.size){
+    const dir = list.filter(m => m._direct), rel = list.filter(m => !m._direct);
+    const main = dir.length ? dir : rel;
+    R.innerHTML = `<div class="sec-head" style="margin-top:0"><h2>Resultados para “${esc(st.q)}”</h2><p>${dir.length ? 'Ministérios que citam essa palavra.' : 'Ministérios da mesma área.'}</p></div><div class="grid">${main.map(m => card(m)).join('')}</div>` +
+      (dir.length && rel.length ? `<div class="sec-head"><h2>Da mesma área</h2><p>Podem combinar com o que você procura.</p></div><div class="grid">${rel.map(m => card(m)).join('')}</div>` : '');
+    return;
+  }
+  if (st.view === 'az'){
+    const sorted = [...list].sort((a,b) => a.n.localeCompare(b.n,'pt'));
+    const letters = [...new Set(sorted.map(m => norm(m.n)[0].toUpperCase()))];
+    R.innerHTML = `<nav class="az" aria-label="Ir para a letra">${letters.map(l => `<a href="#L-${l}">${l}</a>`).join('')}</nav>` +
+      letters.map(l => `<h3 class="letter" id="L-${l}">${l}</h3><div class="grid">${sorted.filter(m => norm(m.n)[0].toUpperCase() === l).map(m => card(m)).join('')}</div>`).join('');
+    return;
+  }
+  const areas = st.areas.size ? AREAS.filter(a => st.areas.has(a.id)) : AREAS;
+  const isOpen = id => st.areas.size ? !closedSel.has(id) : openAreas.has(id);
+  const shown = areas.filter(a => list.some(m => m.g.includes(a.id)));
+  const anyClosed = shown.some(a => !isOpen(a.id)), anyOpen = shown.some(a => isOpen(a.id));
+  R.innerHTML = `<div class="acc-tools"><p>Toque em uma área para ver os ministérios dela.</p><div>
+      <button class="btn btn-sm" type="button" data-accall="open" ${anyClosed ? '' : 'disabled'}>Abrir todas</button>
+      <button class="btn btn-sm" type="button" data-accall="close" ${anyOpen ? '' : 'disabled'}>Fechar todas</button></div></div>` +
+    shown.map(a => {
+    const items = list.filter(m => m.g.includes(a.id)).sort((x,y) => (x.g[0] === a.id ? 0 : 1) - (y.g[0] === a.id ? 0 : 1) || x.n.localeCompare(y.n,'pt'));
+    const open = isOpen(a.id);
+    const peek = items.slice(0,4).map(thumb).join('') + (items.length > 4 ? `<span class="more">+${items.length - 4}</span>` : '');
+    return `<section class="group ${open ? 'open' : ''}" id="g-${a.id}" style="--c:${a.c}">
+      <button type="button" class="acc-h" data-acc="${a.id}" aria-expanded="${open}" aria-controls="gl-${a.id}">
+        <span class="ti" style="--c:${a.c}">${icon(a.id)}</span>
+        <div><h3>${a.n}</h3><small>${items.length} ${items.length === 1 ? 'ministério' : 'ministérios'} · ${a.h}<span class="hint-open"></span></small></div>
+        <span class="peek" aria-hidden="true">${peek}</span>
+        <span class="chev" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+      </button>
+      <div class="grid" id="gl-${a.id}">${open ? items.map(m => card(m)).join('') : ''}</div></section>`;
+  }).join('');
+}
+
+function render(){ renderTiles(); renderActive(); renderResults();
+  $('#hero-eyebrow').textContent = `${ACT().length} ministérios · ${AREAS.length} áreas`;
+  document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === st.view));
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === st.mode));
+  $('#f-pub').value = st.pub; $('#btn-favs').setAttribute('aria-pressed', st.favs);
+  $('#q-clear').hidden = !st.q;
+}
+const toResults = () => { const y = $('#bar').getBoundingClientRect().top + window.scrollY - 4; if (window.scrollY < y - 40) window.scrollTo({top:y, behavior:'smooth'}); };
+
+/* ================= detail modal ================= */
+function openDetail(id, push=true){
+  const m = BY[id]; if (!m) return;
+  const similar = ACT().filter(x => x !== m && x.g.some(g => m.g.includes(g)))
+    .map(x => [x, x.g.filter(g => m.g.includes(g)).length]).sort((a,b) => b[1]-a[1] || a[0].n.localeCompare(b[0].n,'pt')).slice(0,6).map(x => x[0]);
+  const contacts = m.c.map(([who, tel]) => `<div class="contact">
+      <div class="who"><b>${esc(who || m.r)}</b><span>${esc(tel)}</span></div>
+      ${phoneOk(tel) ? `<a class="btn btn-sm btn-wa" href="${waLink(m, tel, who)}" target="_blank" rel="noopener">${WA}WhatsApp</a>` : ''}
+      <button class="btn btn-sm" type="button" data-copy="${esc(tel)}">Copiar número</button>
+    </div>`).join('');
+  const bad = m.c.some(([,t]) => !phoneOk(t));
+  $('#m-modal').innerHTML = `
+    <div class="m-head" style="--c:${m.c0}">
+      <span class="mono" aria-hidden="true">${esc(m.ini)}</span>
+      <div><span class="eyebrow">Ministério</span><h2 id="m-title">${esc(m.n)}</h2>
+        <div class="tags">${m.g.map(g => `<span class="tag" style="--c:${AREA[g].c}">${AREA[g].n}</span>`).join('')}<span class="tag mode">${MODE_TXT[m.m]}</span>${m.p.map(p => `<span class="tag mode">${PUB[p]}</span>`).join('')}</div></div>
+      <button class="btn btn-ghost btn-icon" type="button" data-close-detail aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    ${cover(m, 'm-cover')}
+    <div class="m-body" style="padding-top:16px">
+      <p class="desc">${esc(m.d)}</p>
+      ${m.short ? `<div class="warn">A descrição no site atual é curta. Vale pedir ao responsável um texto contando o que o ministério faz e como entrar.</div>` : ''}
+      ${m.gi ? `<a class="btn" href="../index.html">${icon('turma')}Ver GIs perto de mim no mapa</a>` : ''}
+      <div><span class="eyebrow">Responsável e contato</span><div class="box" style="margin-top:6px">${contacts || `<div class="contact"><div class="who"><b>${esc(m.r)}</b><span>Sem telefone cadastrado. Fale com a secretaria.</span></div></div>`}</div>
+        ${bad ? `<div class="warn" style="margin-top:8px">Este número parece incompleto no site atual. Confirme com a secretaria antes de ligar.</div>` : ''}</div>
+      ${m.l ? `<a class="btn btn-primary" href="${esc(m.l[1])}" target="_blank" rel="noopener">${esc(m.l[0])}</a>` : ''}
+      ${similar.length ? `<div><span class="eyebrow">Também pode combinar com você</span><div class="similar" style="margin-top:8px">${similar.map(x => `<button type="button" data-open="${x.id}" style="--c:${x.c0}"><i></i>${esc(x.n)}</button>`).join('')}</div></div>` : ''}
+      <div class="m-foot">
+        <button class="btn" type="button" data-fav="${m.id}" aria-pressed="${favs.has(m.id)}">${STAR}${favs.has(m.id) ? 'Salvo' : 'Salvar'}</button>
+        <button class="btn" type="button" data-share="${m.id}"><svg class="i" viewBox="0 0 24 24"><path d="M10 14a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 10a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>Copiar link</button>
+      </div>
+    </div>`;
+  $('#m-scrim').hidden = false; document.body.style.overflow = 'hidden';
+  $('#m-modal').scrollTop = 0;
+  if (push) try { history.replaceState(null, '', '#' + m.id); } catch(e){}
+  setTimeout(() => $('#m-modal [data-close-detail]').focus(), 20);
+}
+function closeDetail(){
+  $('#m-scrim').hidden = true; document.body.style.overflow = '';
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+}
+
+/* ================= quiz ================= */
+const QZ = {step:0, areas:new Set(), mode:'', pubs:new Set()};
+const LIFE = [['jovens','Sou jovem','18 a 35 anos'],['adolescentes','Sou adolescente','10 a 17 anos'],['casais','Sou casado(a) ou namoro',''],['mulheres','Sou mulher',''],['homens','Sou homem',''],['idosos','Tenho 60 anos ou mais',''],['solteiros','Sou solteiro(a)',''],['profissionais','Trabalho em uma área específica','Saúde, direito, TI, segurança, obras']];
+function quizScore(){
+  return ACT().map(m => {
+    const hits = m.g.filter(g => QZ.areas.has(g));
+    let s = hits.length * 4 + (hits.length && m.g[0] === hits[0] ? 1 : 0);
+    if (!hits.length) return null;
+    const mOk = !QZ.mode || QZ.mode === 'a' || m.m === 'a' || m.m === QZ.mode;
+    if (mOk) s += 2; else s -= 3;
+    if (m.p.length){
+      if (m.p.some(p => QZ.pubs.has(p))) s += 3;
+      else if (QZ.pubs.size) return null;
+      else s -= 1;
+    }
+    const why = [...hits.map(g => AREA[g].n)];
+    if (m.p.some(p => QZ.pubs.has(p))) why.push(PUB[m.p.find(p => QZ.pubs.has(p))]);
+    return {m, s, why};
+  }).filter(Boolean).sort((a,b) => b.s - a.s || a.m.n.localeCompare(b.m.n,'pt'));
+}
+function renderQuiz(){
+  const body = $('#q-body');
+  document.querySelectorAll('#q-prog i').forEach((el,i) => el.classList.toggle('on', i <= QZ.step));
+  $('#q-back').style.visibility = QZ.step ? 'visible' : 'hidden';
+  const next = $('#q-next'); next.disabled = false;
+  if (QZ.step === 0){
+    body.innerHTML = `<h3>O que você mais gosta de fazer?</h3><p class="hint">Escolha até 3.</p>
+      <div class="opts">${AREAS.map(a => `<button type="button" class="opt" style="--c:${a.c}" data-qa="${a.id}" aria-pressed="${QZ.areas.has(a.id)}" ${!QZ.areas.has(a.id) && QZ.areas.size >= 3 ? 'disabled' : ''}><span class="ti">${icon(a.id)}</span><span>${a.n}<small>${a.h}</small></span></button>`).join('')}</div>`;
+    $('#q-left').textContent = `${QZ.areas.size} de 3`;
+    next.disabled = !QZ.areas.size; next.textContent = 'Continuar';
+  } else if (QZ.step === 1){
+    body.innerHTML = `<h3>O que você procura?</h3><p class="hint">Uns ministérios são para servir na igreja, outros são grupos para você participar.</p>
+      <div class="opts">${[['s','Um lugar para servir','Usar meus dons como voluntário'],['p','Um grupo para participar','Cursos, encontros, comunhão'],['a','Os dois','Quero ver tudo']].map(([v,t,h]) => `<button type="button" class="opt" data-qm="${v}" aria-pressed="${QZ.mode === v}"><span>${t}<small>${h}</small></span></button>`).join('')}</div>`;
+    $('#q-left').textContent = '';
+    next.disabled = !QZ.mode; next.textContent = 'Continuar';
+  } else if (QZ.step === 2){
+    body.innerHTML = `<h3>Conte um pouco sobre você</h3><p class="hint">Opcional. Ajuda a mostrar ministérios feitos para a sua fase. Pode marcar mais de um.</p>
+      <div class="opts">${LIFE.map(([v,t,h]) => `<button type="button" class="opt" data-qp="${v}" aria-pressed="${QZ.pubs.has(v)}"><span>${t}${h ? `<small>${h}</small>` : ''}</span></button>`).join('')}</div>`;
+    $('#q-left').textContent = '';
+    next.textContent = QZ.pubs.size ? 'Ver resultado' : 'Pular e ver resultado';
+  } else {
+    const res = quizScore();
+    const top = res.slice(0,6);
+    body.innerHTML = top.length ? `<h3>${top.length === 1 ? 'Este ministério combina' : `Estes ${top.length} ministérios combinam`} com você</h3><p class="hint">Fale com o responsável pelo WhatsApp ou salve para ver depois.</p>
+      <div class="q-res">${top.map(r => card(r.m, {why:'Combina: ' + r.why.join(' · '), noCover:true})).join('')}</div>
+      ${res.length > top.length ? `<p class="hint" style="margin-top:12px">Tem mais ${res.length - top.length} ${res.length - top.length === 1 ? 'opção' : 'opções'} nessas áreas.</p>` : ''}`
+      : `<div class="empty"><b>Não achamos uma combinação exata</b>Tente marcar outras áreas ou pular a pergunta sobre você.</div>`;
+    $('#q-left').textContent = '';
+    next.textContent = 'Ver todos nessas áreas';
+  }
+}
+function openQuiz(){ QZ.step = 0; $('#q-scrim').hidden = false; document.body.style.overflow = 'hidden'; renderQuiz(); }
+function closeQuiz(){ $('#q-scrim').hidden = true; if ($('#m-scrim').hidden) document.body.style.overflow = ''; }
+$('#q-next').addEventListener('click', () => {
+  if (QZ.step < 3){ QZ.step++; renderQuiz(); $('#q-body').scrollTop = 0; return; }
+  st.areas = new Set(QZ.areas); st.mode = QZ.mode === 'a' ? '' : QZ.mode; st.q = ''; $('#q').value = ''; st.favs = false; st.view = 'grupos';
+  closeQuiz(); render(); toResults();
+});
+$('#q-back').addEventListener('click', () => { if (QZ.step){ QZ.step--; renderQuiz(); } });
+$('#q-body').addEventListener('click', e => {
+  const a = e.target.closest('[data-qa]'), mo = e.target.closest('[data-qm]'), p = e.target.closest('[data-qp]');
+  if (a){ const v = a.dataset.qa; QZ.areas.has(v) ? QZ.areas.delete(v) : QZ.areas.size < 3 && QZ.areas.add(v); renderQuiz(); }
+  else if (mo){ QZ.mode = mo.dataset.qm; renderQuiz(); }
+  else if (p){ const v = p.dataset.qp; QZ.pubs.has(v) ? QZ.pubs.delete(v) : QZ.pubs.add(v); renderQuiz(); }
+});
+$('#btn-quiz').addEventListener('click', openQuiz);
+document.querySelectorAll('[data-close-quiz]').forEach(b => b.addEventListener('click', closeQuiz));
+$('#q-scrim').addEventListener('click', e => { if (e.target.id === 'q-scrim') closeQuiz(); });
+
+/* ================= events ================= */
+PUBS.forEach(([v,t]) => $('#f-pub').insertAdjacentHTML('beforeend', `<option value="${v}">Feito para: ${t}</option>`));
+$('#f-pub').addEventListener('change', e => { st.pub = e.target.value; render(); });
+let qT;
+$('#q').addEventListener('input', e => { clearTimeout(qT); qT = setTimeout(() => { st.q = e.target.value.trim(); render(); }, 120); });
+$('#q').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); st.q = e.target.value.trim(); render(); toResults(); e.target.blur(); } });
+$('#q-clear').addEventListener('click', () => { $('#q').value = ''; st.q = ''; render(); $('#q').focus(); });
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('button, a, [data-open]'); if (!t) return;
+  const d = t.dataset;
+  if (d.acc){ toggleArea(d.acc); return; }
+  if (d.accall){ const ids = [...document.querySelectorAll('.group')].map(g => g.id.slice(2));
+    if (st.areas.size){ d.accall === 'open' ? closedSel.clear() : ids.forEach(i => closedSel.add(i)); }
+    else { d.accall === 'open' ? ids.forEach(i => openAreas.add(i)) : openAreas.clear(); saveOpen(); }
+    renderResults(); return; }
+  if (d.area){ closedSel.clear(); st.areas.has(d.area) ? st.areas.delete(d.area) : st.areas.add(d.area); render(); if (st.areas.has(d.area)) toResults(); }
+  else if (d.areaOnly){ st.areas = new Set([d.areaOnly]); st.q = ''; $('#q').value = ''; st.favs = false; render(); }
+  else if (d.try){ $('#q').value = d.try; st.q = d.try; render(); toResults(); }
+  else if (d.mode !== undefined && t.closest('.bar')){ st.mode = d.mode; render(); }
+  else if (d.view){ st.view = d.view; render(); }
+  else if (d.open){ e.preventDefault(); openDetail(d.open); }
+  else if (d.fav){
+    const id = d.fav; favs.has(id) ? favs.delete(id) : favs.add(id); saveFavs();
+    toast(favs.has(id) ? `${BY[id].n} salvo` : `${BY[id].n} removido dos salvos`);
+    document.querySelectorAll(`[data-fav="${id}"]`).forEach(b => { b.setAttribute('aria-pressed', favs.has(id)); if (b.closest('.m-foot')) b.innerHTML = STAR + (favs.has(id) ? 'Salvo' : 'Salvar'); });
+    if (st.favs) render();
+  }
+  else if (d.copy){ copy(d.copy, 'Número copiado'); }
+  else if (d.share){ copy(location.href.split('#')[0] + '#' + d.share, 'Link do ministério copiado'); }
+  else if (d.rm){
+    const r = d.rm;
+    if (r === 'q'){ st.q = ''; $('#q').value = ''; }
+    else if (r.startsWith('area:')) st.areas.delete(r.slice(5));
+    else if (r === 'mode') st.mode = '';
+    else if (r === 'pub') st.pub = '';
+    else if (r === 'favs') st.favs = false;
+    else if (r === 'all'){ st.q = ''; $('#q').value = ''; st.areas.clear(); st.mode = ''; st.pub = ''; st.favs = false; }
+    render();
+  }
+  else if ('closeDetail' in d) closeDetail();
+});
+$('#btn-favs').addEventListener('click', () => { st.favs = !st.favs; render(); toResults(); });
+$('#m-scrim').addEventListener('click', e => { if (e.target.id === 'm-scrim') closeDetail(); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!$('#m-scrim').hidden) closeDetail(); else if (!$('#q-scrim').hidden) closeQuiz();
+});
+/* ================= abas ================= */
+let TAB = 'explorar';
+function showTab(t, push=true){
+  TAB = t;
+  ['explorar','dashboard','admin'].forEach(v => { $('#view-' + v).hidden = v !== t; });
+  document.querySelectorAll('.ptab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  $('#btn-favs').hidden = t !== 'explorar';
+  if (t === 'dashboard') renderDash();
+  if (t === 'admin') renderAdmin();
+  if (t === 'explorar') render();
+  if (push) try { history.replaceState(null, '', t === 'explorar' ? location.pathname : '#' + t); } catch(e){}
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.ptab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+function renderAll(){ render(); if (TAB === 'dashboard') renderDash(); if (TAB === 'admin') renderAdmin(); }
+
+/* ================= pendências ================= */
+function issues(m){
+  const out = [];
+  if (!m.c.length) out.push(['Sem contato', 'red']);
+  else if (m.c.some(([,t]) => !phoneOk(t))) out.push(['Telefone a conferir', 'red']);
+  if (m.short) out.push(['Descrição curta', '']);
+  if (!artSrc(m)) out.push(['Sem arte própria', '']);
+  return out;
+}
+function thumb(m){
+  const src = artSrc(m);
+  return src ? `<span class="thumb" style="background:${artBg(m)}"><img src="${src}" alt="" loading="lazy" onerror="this.remove()"></span>`
+             : `<span class="thumb gen" style="--c:${m.c0}">${esc(m.ini)}</span>`;
+}
+
+/* ================= dashboard ================= */
+function renderDash(){
+  const act = ACT(), off = DATA.filter(m => m.ativo === false);
+  const withIssue = act.filter(m => issues(m).length);
+  const phones = {};
+  act.forEach(m => m.c.forEach(([, t]) => { const d = digits(t); if (d.length >= 10){ (phones[d] = phones[d] || {tel:t, list:new Set(), who:new Set()}).list.add(m.n); phones[d].who.add(m.r); } }));
+  const top = Object.values(phones).filter(x => x.list.size > 1).sort((a,b) => b.list.size - a.list.size).slice(0,6);
+  const byArea = AREAS.map(a => ({a, n: act.filter(m => m.g.includes(a.id)).length})).sort((x,y) => y.n - x.n);
+  const maxA = Math.max(1, ...byArea.map(x => x.n));
+  const modes = [['s','Para servir','var(--accent)'],['p','Para participar','#6B5BB8'],['a','Servir e participar','#B8861B']].map(([k,l,c]) => ({k,l,c,n:act.filter(m => m.m === k).length}));
+  const pubs = PUBS.map(([k,l]) => ({k,l,n:act.filter(m => m.p.includes(k)).length})).filter(x => x.n);
+  const resp = new Set(act.map(m => m.r)).size;
+  const order = {red:0, '':1};
+  const iss = withIssue.map(m => ({m, list:issues(m)})).sort((a,b) => (order[a.list[0][1]] - order[b.list[0][1]]) || b.list.length - a.list.length || a.m.n.localeCompare(b.m.n,'pt'));
+
+  $('#dash').innerHTML = `
+    <div class="page-head"><div><h1>Visão geral dos ministérios</h1><p>Números calculados a partir do cadastro do Admin.</p></div>
+      <button class="btn" type="button" data-gotab="admin">Abrir o Admin</button></div>
+    <div class="kpi"><div class="eyebrow">Ministérios ativos</div><div class="v">${act.length}</div><div class="h">em ${AREAS.filter(a => act.some(m => m.g.includes(a.id))).length} áreas</div></div>
+    <div class="kpi"><div class="eyebrow">Desativados</div><div class="v">${off.length}</div><div class="h">não aparecem para os membros</div></div>
+    <div class="kpi"><div class="eyebrow">Responsáveis</div><div class="v">${resp}</div><div class="h">nomes diferentes cadastrados</div></div>
+    <div class="kpi ${withIssue.length ? 'warnk' : ''}"><div class="eyebrow">Com pendência</div><div class="v">${withIssue.length}</div><div class="h">telefone, descrição ou arte</div></div>
+
+    <section class="dcard c-7">
+      <h3>Ministérios por área</h3><p class="sub">Um ministério pode contar em mais de uma área. Toque para ver em Explorar.</p>
+      <div class="hbars">${byArea.map(({a,n}) => `<button type="button" class="hbar" data-goarea="${a.id}" style="--c:${a.c}" title="${a.n}: ${n} ${n === 1 ? 'ministério' : 'ministérios'}">
+        <span class="ti">${icon(a.id)}</span><span class="n">${a.n}</span><span class="track"><i style="width:${(n/maxA*100).toFixed(1)}%"></i></span><span class="val">${n}</span></button>`).join('')}</div>
+    </section>
+    <section class="dcard c-5">
+      <h3>Servir ou participar</h3><p class="sub">Tipo de cada ministério ativo.</p>
+      <div class="stack" role="img" aria-label="${modes.map(x => `${x.l}: ${x.n}`).join(', ')}">${modes.filter(x => x.n).map(x => `<span style="--c:${x.c};flex:${x.n}" title="${x.l}: ${x.n}"></span>`).join('')}</div>
+      <div class="leg">${modes.map(x => `<div style="--c:${x.c}"><i></i>${x.l}<b>${x.n}</b></div>`).join('')}</div>
+      <h3 style="margin-top:22px">Feitos para um público</h3><p class="sub">Os demais são abertos a todos.</p>
+      <div class="leg">${pubs.map(x => `<div style="--c:var(--ink-2)"><i></i>${x.l}<b>${x.n}</b></div>`).join('') || '<span class="sub">Nenhum.</span>'}</div>
+    </section>
+
+    <section class="dcard c-7">
+      <h3>Pendências para corrigir</h3><p class="sub">${iss.length ? 'Os de telefone primeiro, porque impedem o contato pelo WhatsApp.' : 'Nada pendente.'}</p>
+      <ul class="issues">${iss.map(({m,list}) => `<li>${thumb(m)}<div><div class="nm">${esc(m.n)}</div><div class="tags">${list.map(([t,c]) => `<span class="flag ${c}">${t}</span>`).join('')}</div></div>
+        <button class="btn btn-sm" type="button" data-edit="${m.id}">Corrigir</button></li>`).join('')}</ul>
+    </section>
+    <section class="dcard c-5">
+      <h3>Mesmo contato em vários ministérios</h3><p class="sub">Telefones que respondem por mais de um ministério. Vale ver se a pessoa não está sobrecarregada.</p>
+      <ul class="issues">${top.map(x => `<li><span class="thumb gen" style="--c:var(--accent)">${x.list.size}</span><div><div class="nm">${esc([...x.who][0])}</div><div class="muted" style="font-size:12.5px;color:var(--ink-2)">${esc(x.tel)} · ${esc([...x.list].join(', '))}</div></div><span></span></li>`).join('') || '<li class="sub">Nenhum contato repetido.</li>'}</ul>
+      ${off.length ? `<h3 style="margin-top:22px">Desativados</h3><p class="sub">Escondidos dos membros.</p>
+      <ul class="issues">${off.map(m => `<li>${thumb(m)}<div class="nm">${esc(m.n)}</div><button class="btn btn-sm" type="button" data-toggle="${m.id}">Reativar</button></li>`).join('')}</ul>` : ''}
+    </section>`;
+}
+
+/* ================= admin: lista ================= */
+AREAS.forEach(a => $('#a-area').insertAdjacentHTML('beforeend', `<option value="${a.id}">${a.n}</option>`));
+['#a-q','#a-status','#a-area'].forEach(s => $(s).addEventListener('input', renderAdmin));
+function renderAdmin(){
+  const q = norm($('#a-q').value.trim()), stt = $('#a-status').value, ar = $('#a-area').value;
+  const qd = q.replace(/\D/g,'');
+  const list = DATA.filter(m =>
+    (!q || m.hay.n.includes(q) || norm(m.r).includes(q) || (qd.length >= 3 && m.c.some(([,t]) => digits(t).includes(qd)))) &&
+    (!stt || (stt === 'on' && m.ativo !== false) || (stt === 'off' && m.ativo === false) || (stt === 'issue' && issues(m).length)) &&
+    (!ar || m.g.includes(ar))
+  ).sort((a,b) => a.n.localeCompare(b.n,'pt'));
+  $('#a-rows').innerHTML = list.map(m => {
+    const on = m.ativo !== false, tel = m.c[0] ? m.c[0][1] : '';
+    const bad = issues(m).find(x => x[1] === 'red');
+    return `<tr class="${on ? '' : 'off'}">
+      <td>${thumb(m)}</td>
+      <td><div class="nm">${esc(m.n)}</div><div class="mini">${m.g.map(g => `<span class="tag" style="--c:${AREA[g].c}">${AREA[g].n}</span>`).join('')}</div></td>
+      <td>${esc(m.r)}</td>
+      <td class="tel">${esc(tel) || '<span class="muted">—</span>'}${m.c.length > 1 ? ` <span class="muted">+${m.c.length - 1}</span>` : ''}${bad ? `<div><span class="flag red">${bad[0]}</span></div>` : ''}</td>
+      <td class="muted">${MODE_TXT[m.m]}</td>
+      <td><button type="button" class="sw-wrap" role="switch" aria-checked="${on}" data-toggle="${m.id}" aria-label="${on ? 'Desativar' : 'Ativar'} ${esc(m.n)}"><span class="switch"></span>${on ? 'Ativo' : 'Desativado'}</button></td>
+      <td style="text-align:right"><button class="btn btn-sm" type="button" data-edit="${m.id}">Editar</button></td></tr>`;
+  }).join('') || `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--ink-2)">Nenhum ministério com esses filtros.</td></tr>`;
+  const offN = DATA.filter(m => m.ativo === false).length;
+  $('#a-count').textContent = `Mostrando ${list.length} de ${DATA.length} ministérios · ${DATA.length - offN} ativos, ${offN} desativados.`;
+}
+function toggleActive(id){
+  const m = BY[id]; if (!m) return;
+  m.ativo = m.ativo === false; saveData(); renderAll();
+  toast(m.ativo ? `${m.n} reativado. Já aparece para os membros.` : `${m.n} desativado. Não aparece mais para os membros.`);
+}
+
+/* exportar / importar / restaurar */
+$('#a-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({versao:1, exportadoEm:new Date().toISOString(), ministerios:DATA.map(strip)}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `ministerios-imagine-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Arquivo exportado');
+});
+$('#a-import').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text()); const arr = Array.isArray(j) ? j : j.ministerios;
+    if (!Array.isArray(arr) || !arr.length || !arr.every(m => m && m.n && m.id)) throw new Error();
+    DATA = arr; reindex(); saveData(); renderAll(); toast(`${arr.length} ministérios importados`);
+  } catch(err){ toast('Esse arquivo não é uma exportação válida desta página.'); }
+});
+let resetArm = 0;
+$('#a-reset').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (Date.now() - resetArm > 4000){ resetArm = Date.now(); b.textContent = 'Clique de novo para confirmar'; b.classList.add('btn-danger'); setTimeout(() => { b.textContent = 'Restaurar original'; b.classList.remove('btn-danger'); }, 4000); return; }
+  resetArm = 0; b.textContent = 'Restaurar original'; b.classList.remove('btn-danger');
+  DATA = JSON.parse(JSON.stringify(SEED)); reindex(); saveData(); renderAll(); toast('Lista original do site restaurada');
+});
+
+/* ================= admin: editor ================= */
+let ED = null, edId = null, delArm = 0;
+const E = id => document.getElementById(id);
+function openEditor(id){
+  edId = id || null;
+  const src = id ? BY[id] : {n:'', d:'', g:[], m:'s', p:[], t:'', r:'', c:[['','']], ativo:true};
+  ED = JSON.parse(JSON.stringify(strip(src)));
+  if (!ED.c.length) ED.c = [['','']];
+  E('e-title').textContent = id ? `Editar ${src.n}` : 'Novo ministério';
+  E('e-n').value = ED.n; E('e-d').value = ED.d; E('e-r').value = ED.r; E('e-t').value = ED.t;
+  E('e-lt').value = ED.l ? ED.l[0] : ''; E('e-lu').value = ED.l ? ED.l[1] : '';
+  ['n','d','g','r','lu'].forEach(k => setE(k));
+  E('e-del-zone').hidden = !id; resetDel();
+  E('e-msg').textContent = id ? '' : 'Preencha nome, descrição, área e responsável.';
+  drawEditor(); E('e-scrim').hidden = false; document.body.style.overflow = 'hidden';
+  setTimeout(() => E('e-n').focus(), 30);
+}
+function closeEditor(){ E('e-scrim').hidden = true; ED = null; if ($('#m-scrim').hidden && $('#q-scrim').hidden) document.body.style.overflow = ''; }
+function setE(k, msg){ const e = E('er-' + k); if (!e) return; e.hidden = !msg; e.textContent = msg || ''; const f = E('e-' + k); if (f && f.tagName !== 'DIV') f.classList.toggle('bad', !!msg); }
+function drawEditor(){
+  E('e-g').innerHTML = AREAS.map(a => { const i = ED.g.indexOf(a.id); return `<button type="button" data-eg="${a.id}" style="--c:${a.c}" aria-pressed="${i >= 0}" ${i < 0 && ED.g.length >= 3 ? 'disabled' : ''}><span class="ti">${icon(a.id)}</span>${a.n}${i === 0 ? ' <small>principal</small>' : ''}</button>`; }).join('');
+  E('e-m').innerHTML = [['s','Para servir'],['p','Para participar'],['a','Os dois']].map(([k,l]) => `<button type="button" class="np" data-em="${k}" aria-pressed="${ED.m === k}">${l}</button>`).join('');
+  E('e-p').innerHTML = PUBS.map(([k,l]) => `<button type="button" class="np" data-ep="${k}" aria-pressed="${ED.p.includes(k)}">${l}</button>`).join('');
+  E('e-c').innerHTML = ED.c.map(([w,t], i) => `<div class="crow"><input class="c-name" data-ci="${i}" data-cf="0" value="${esc(w)}" placeholder="Nome (opcional)" aria-label="Nome do contato ${i+1}">
+    <input data-ci="${i}" data-cf="1" value="${esc(t)}" inputmode="tel" placeholder="(34) 99999-0000" aria-label="Telefone ${i+1}" class="${t && !phoneOk(t) ? 'bad' : ''}">
+    <button class="btn btn-ghost btn-icon" type="button" data-crm="${i}" aria-label="Remover contato ${i+1}" ${ED.c.length === 1 ? 'disabled' : ''}><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`).join('');
+  E('e-c-add').hidden = ED.c.length >= 4;
+  drawImg(); drawPreview(); counter();
+}
+function counter(){ const n = E('e-d').value.trim().length; E('e-d-c').textContent = `${n} caracteres${n < 40 ? ' · descrições com menos de 40 caracteres aparecem como pendência' : ''}`; }
+function previewObj(){
+  const o = JSON.parse(JSON.stringify(ED));
+  o.id = edId || '__novo__'; o.n = o.n || 'Nome do ministério'; o.d = o.d || 'A descrição aparece aqui.'; o.r = o.r || 'Responsável';
+  if (!o.g.length) o.g = ['bastidores'];
+  o.c = o.c.filter(c => c[1].trim()); prep(o); return o;
+}
+function drawImg(){
+  const o = previewObj();
+  E('e-img-prev').innerHTML = thumb(o);
+  E('e-img-orig').hidden = !(IMG[edId] && (ED.img || ED.noArt));
+  E('e-img-gen').hidden = !artSrc(o);
+}
+function drawPreview(){ E('e-prev').innerHTML = card(previewObj()); }
+function syncText(){
+  ED.n = E('e-n').value.trim(); ED.d = E('e-d').value.trim(); ED.r = E('e-r').value.trim(); ED.t = E('e-t').value.trim();
+  const lt = E('e-lt').value.trim(), lu = E('e-lu').value.trim();
+  if (lt || lu) ED.l = [lt || 'Saiba mais', lu]; else delete ED.l;
+}
+E('e-form').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.ci !== undefined){ ED.c[+t.dataset.ci][+t.dataset.cf] = t.value; if (t.dataset.cf === '1') t.classList.toggle('bad', !!t.value.trim() && !phoneOk(t.value)); }
+  else syncText();
+  if (t.id === 'e-d') counter();
+  drawPreview(); if (t.id === 'e-n') drawImg();
+});
+E('e-form').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const d = b.dataset;
+  if (d.eg){ const i = ED.g.indexOf(d.eg); i >= 0 ? ED.g.splice(i,1) : ED.g.length < 3 && ED.g.push(d.eg); setE('g'); drawEditor(); }
+  else if (d.em){ ED.m = d.em; drawEditor(); }
+  else if (d.ep){ const i = ED.p.indexOf(d.ep); i >= 0 ? ED.p.splice(i,1) : ED.p.push(d.ep); drawEditor(); }
+  else if (d.crm !== undefined){ ED.c.splice(+d.crm, 1); drawEditor(); }
+  else if (b.id === 'e-c-add'){ ED.c.push(['','']); drawEditor(); const ins = E('e-c').querySelectorAll('input'); ins[ins.length - 2].focus(); }
+  else if (b.id === 'e-img-gen'){ delete ED.img; delete ED.imgBg; ED.noArt = true; drawImg(); drawPreview(); }
+  else if (b.id === 'e-img-orig'){ delete ED.img; delete ED.imgBg; delete ED.noArt; drawImg(); drawPreview(); }
+  else if (b.id === 'e-ativo'){ ED.ativo = ED.ativo === false; drawAtivo(); }
+  else if (b.id === 'e-del'){
+    if (Date.now() - delArm > 4000){ delArm = Date.now(); b.textContent = 'Clique de novo para excluir'; b.classList.add('btn-danger'); setTimeout(resetDel, 4000); return; }
+    const n = BY[edId].n; DATA = DATA.filter(m => m.id !== edId); favs.delete(edId); saveFavs(); reindex(); saveData(); closeEditor(); renderAll(); toast(`${n} excluído`);
+  }
+  else if ('eClose' in d) closeEditor();
+});
+function resetDel(){ delArm = 0; const b = E('e-del'); b.textContent = 'Excluir ministério'; b.classList.remove('btn-danger'); }
+function drawAtivo(){ const on = ED.ativo !== false; E('e-ativo').setAttribute('aria-checked', on); E('e-ativo-t').textContent = on ? 'Ativo: aparece para os membros' : 'Desativado: escondido dos membros'; }
+const _draw = drawEditor; drawEditor = function(){ _draw(); drawAtivo(); };
+E('e-scrim').addEventListener('click', e => { if (e.target.id === 'e-scrim') closeEditor(); });
+E('e-img').addEventListener('change', e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  if (!/^image\//.test(f.type)){ toast('Escolha um arquivo de imagem (JPG ou PNG).'); return; }
+  const r = new FileReader();
+  r.onload = () => { const im = new Image(); im.onload = () => {
+    const w = Math.min(800, im.width), h = Math.round(im.height * w / im.width);
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const cx = cv.getContext('2d'); cx.drawImage(im, 0, 0, w, h);
+    const px = cx.getImageData(1, 1, 1, 1).data;
+    ED.img = cv.toDataURL('image/jpeg', 0.8); ED.imgBg = `rgb(${px[0]},${px[1]},${px[2]})`; delete ED.noArt;
+    drawImg(); drawPreview(); toast('Imagem pronta. Clique em Salvar para guardar.');
+  }; im.onerror = () => toast('Não consegui abrir essa imagem.'); im.src = r.result; };
+  r.readAsDataURL(f);
+});
+E('e-form').addEventListener('submit', e => {
+  e.preventDefault(); syncText();
+  let ok = true;
+  const dup = DATA.find(m => norm(m.n) === norm(ED.n) && m.id !== edId);
+  if (!ED.n){ setE('n', 'Informe o nome.'); ok = false; } else if (dup){ setE('n', `Já existe um ministério chamado ${dup.n}.`); ok = false; } else setE('n');
+  if (ED.d.length < 10){ setE('d', 'Escreva uma descrição de pelo menos uma frase.'); ok = false; } else setE('d');
+  if (!ED.g.length){ setE('g', 'Escolha pelo menos uma área.'); ok = false; } else setE('g');
+  if (!ED.r){ setE('r', 'Informe o responsável.'); ok = false; } else setE('r');
+  if (ED.l && ED.l[1] && !/^https?:\/\/\S+\.\S+/.test(ED.l[1])){ setE('lu', 'O link precisa começar com https://'); ok = false; } else setE('lu');
+  if (!ok){ E('e-msg').textContent = 'Confira os campos marcados.'; const bad = E('e-form').querySelector('.err:not([hidden])'); if (bad) bad.scrollIntoView({block:'center', behavior:'smooth'}); return; }
+  ED.c = ED.c.map(([w,t]) => [w.trim(), t.trim()]).filter(c => c[1]);
+  if (ED.l && !ED.l[1]) delete ED.l;
+  let m;
+  if (edId){ m = BY[edId]; Object.keys(m).forEach(k => { if (!DERIVED.includes(k) && k !== 'id') delete m[k]; }); Object.assign(m, ED, {id: edId}); }
+  else { let id = slug(ED.n) || 'ministerio', i = 2; while (BY[id]) id = `${slug(ED.n)}-${i++}`; m = {...ED, id}; DATA.push(m); }
+  reindex();
+  if (!saveData()) return;
+  const n = m.n; closeEditor(); renderAll();
+  const bad = issues(BY[m.id]).find(x => x[1] === 'red');
+  toast(`${n} salvo${m.ativo === false ? ' (desativado)' : ''}${bad ? ` · ${bad[0].toLowerCase()}` : ''}`);
+});
+
+/* cliques do dashboard / admin */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-edit],[data-toggle],[data-gotab],[data-goarea],#a-new'); if (!b) return;
+  if (b.id === 'a-new'){ openEditor(null); return; }
+  const d = b.dataset;
+  if (d.edit){ if (TAB !== 'admin') showTab('admin'); openEditor(d.edit); }
+  else if (d.toggle) toggleActive(d.toggle);
+  else if (d.gotab) showTab(d.gotab);
+  else if (d.goarea){ st.areas = new Set([d.goarea]); st.q = ''; $('#q').value = ''; st.favs = false; showTab('explorar'); setTimeout(toResults, 50); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !E('e-scrim').hidden){ e.stopImmediatePropagation(); closeEditor(); } }, true);
+
+/* ================= início ================= */
+function route(){
+  const h = location.hash.slice(1);
+  if (h === 'admin' || h === 'dashboard'){ showTab(h, false); return; }
+  if (TAB !== 'explorar') showTab('explorar', false);
+  if (BY[h] && BY[h].ativo !== false) openDetail(h, false);
+}
+window.addEventListener('hashchange', route);
+render();
+route();
+
+})();
+</script>
+</body>
+</html>
